@@ -46,8 +46,17 @@ public class EntryAdapter extends RecyclerView.Adapter <EntryAdapter.EntryViewHo
         entry = mCursor.getString(mCursor.getColumnIndex("ENTRY"));
         id = mCursor.getInt(mCursor.getColumnIndex("_id"));
 
-        holder.date.setText(date);
+        int x = Integer.parseInt(time.substring(0,time.indexOf(":")));
+        String y = time.substring(time.indexOf(":"),time.length());
+        if (x >= 12 ){
+            x = x-12;
+            time = x + y + " PM";
+        } else{
+            x = x+1;
+            time = x + y + " AM";
+        }
         holder.time.setText(time);
+        holder.date.setText(date);
         holder.entry.setText(entry);
         holder.itemView.setTag(id);
         holder.cardView.setOnClickListener(new View.OnClickListener() {

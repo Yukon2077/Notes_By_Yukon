@@ -80,10 +80,10 @@ public class CreateActivity extends AppCompatActivity {
 
     }
     private String getTime() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat(
+        SimpleDateFormat timeFormat = new SimpleDateFormat(
                 "HH:mm", Locale.getDefault());
-        Date date = new Date();
-        return dateFormat.format(date);
+        Date time = new Date();
+        return timeFormat.format(time);
     }
     private String getDate() {
         SimpleDateFormat dateFormat = new SimpleDateFormat(
