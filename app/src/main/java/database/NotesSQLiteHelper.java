@@ -42,8 +42,8 @@ public class NotesSQLiteHelper extends SQLiteOpenHelper {
         contentValues.put("TIME",time);
         contentValues.put("ENTRY",entry);
         db.insert("ENTRIES",null, contentValues);
-        Log.d("nope","hmm");
     }
+
 
     public Cursor getAllItems(){
         SQLiteDatabase db = getReadableDatabase();

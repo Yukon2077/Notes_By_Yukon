@@ -14,11 +14,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.yukon.notes.R;
 
-import activities.CreateActivity;
+import activities.WriteActivity;
 
 public class EntryAdapter extends RecyclerView.Adapter <EntryAdapter.EntryViewHolder> {
 
-    private Context mContext;
+    private final Context mContext;
     private Cursor mCursor;
 
     public EntryAdapter(Context context, Cursor cursor){
@@ -46,15 +46,9 @@ public class EntryAdapter extends RecyclerView.Adapter <EntryAdapter.EntryViewHo
         entry = mCursor.getString(mCursor.getColumnIndex("ENTRY"));
         id = mCursor.getInt(mCursor.getColumnIndex("_id"));
 
-        int x = Integer.parseInt(time.substring(0,time.indexOf(":")));
-        String y = time.substring(time.indexOf(":"),time.length());
-        if (x >= 12 ){
-            x = x-12;
-            time = x + y + " PM";
-        } else{
-            x = x+1;
-            time = x + y + " AM";
-        }
+        time = changeTimeFormat(time);
+        date = changeDateFormat(date);
+
         holder.time.setText(time);
         holder.date.setText(date);
         holder.entry.setText(entry);
@@ -62,8 +56,9 @@ public class EntryAdapter extends RecyclerView.Adapter <EntryAdapter.EntryViewHo
         holder.cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(mContext, CreateActivity.class);
+                Intent intent = new Intent(mContext, WriteActivity.class);
                 intent.putExtra("ID",id);
+                intent.putExtra("ENTRY",entry);
                 mContext.startActivity(intent);
             }
         });
@@ -100,5 +95,31 @@ public class EntryAdapter extends RecyclerView.Adapter <EntryAdapter.EntryViewHo
         }
 
 
+    }
+
+    public String changeTimeFormat(String time){
+        int x = Integer.parseInt(time.substring(0,time.indexOf(":")));
+        String y = time.substring(time.indexOf(":"));
+        if (x > 12 ){
+            x = x-12;
+            time = x + y + " PM";
+        } else if(x>0){
+            time = x + y + " AM";
+        } else{
+            x=12;
+            time = x + y + " AM";
+        }
+        return time;
+    }
+
+    public String changeDateFormat(String date){
+        String y,m,d;
+        y = date.substring(0,date.indexOf("-"));
+        m = date.substring(date.indexOf("-")+1,date.lastIndexOf("-"));
+        d = date.substring(date.lastIndexOf("-")+1);
+
+        date = m + "/" + d;
+
+        return date;
     }
 }
