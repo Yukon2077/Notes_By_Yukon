@@ -7,6 +7,7 @@ import androidx.appcompat.widget.Toolbar;
 
 import android.content.ContentValues;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -31,15 +32,19 @@ public class WriteActivity extends AppCompatActivity {
     public SQLiteDatabase db;
     public EditText editText;
     public Integer id;
+    public SharedPreferences sharedPreferences;
+    public SharedPreferences.Editor editor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        MainActivity.setAppTheme(this);
         setContentView(R.layout.activity_write);
 
-        id = null;
+        id = -1;
         date = getDate();
         time = getTime();
+        entry = "";
 
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -48,6 +53,9 @@ public class WriteActivity extends AppCompatActivity {
         actionBar.setHomeAsUpIndicator(R.drawable.ic_back);
 
         editText = findViewById(R.id.editTextEntry);
+
+        sharedPreferences = this.getSharedPreferences("com.yukon.notes.Last_Entry",MODE_PRIVATE);
+        editor = sharedPreferences.edit();
 
 
         Bundle extras = getIntent().getExtras();
@@ -58,6 +66,21 @@ public class WriteActivity extends AppCompatActivity {
         }
 
     }
+
+    @Override
+    protected void onPause() {
+
+
+        editor.putString("last_entry",editText.getText().toString().trim());
+        editor.putInt("last_id",id);
+
+        editor.apply();
+        super.onPause();
+    }
+
+
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -90,7 +113,7 @@ public class WriteActivity extends AppCompatActivity {
         try{
             db = notesSQLiteHelper.getWritableDatabase();
             entry = editText.getText().toString();
-            if( id == null ) {
+            if( id == null || id == -1) {
                 notesSQLiteHelper.insertEntry(db, date, time, entry);
             } else{
                 ContentValues contentValues = new ContentValues();
@@ -98,7 +121,9 @@ public class WriteActivity extends AppCompatActivity {
                 contentValues.put("TIME",time);
                 contentValues.put("ENTRY",entry);
                 db.update("ENTRIES",contentValues,"_id = ?", new String[]{ String.valueOf(id) } );
+
             }
+            editText.setText("");
             db.close();
             finish();
         }catch (SQLException e){
@@ -108,14 +133,14 @@ public class WriteActivity extends AppCompatActivity {
         }
 
     }
-    private String getTime() {
+    public static String getTime() {
         SimpleDateFormat timeFormat = new SimpleDateFormat(
                 "HH:mm", Locale.getDefault());
         Date time = new Date();
         return timeFormat.format(time);
     }
 
-    private String getDate() {
+    public static String getDate() {
         SimpleDateFormat dateFormat = new SimpleDateFormat(
                 "yyyy-MM-dd", Locale.getDefault());
         Date date = new Date();

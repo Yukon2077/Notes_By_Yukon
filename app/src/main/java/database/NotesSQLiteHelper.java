@@ -9,6 +9,8 @@ import android.util.Log;
 
 import androidx.annotation.Nullable;
 
+import activities.WriteActivity;
+
 public class NotesSQLiteHelper extends SQLiteOpenHelper {
 
     private static final String DB_NAME = "NotesSQL";
@@ -26,10 +28,16 @@ public class NotesSQLiteHelper extends SQLiteOpenHelper {
                 + "DATE DATE, "
                 + "TIME TIME, "
                 + "ENTRY TEXT);");
+        /*insertEntry(db, WriteActivity.getDate(), WriteActivity.getTime(),"Notes\n\n" +
+                "An App to write and save notes for later.\n" +
+                "");
+        insertEntry(db, WriteActivity.getDate(), WriteActivity.getTime(),"Swipe left or right to delete entries");*/
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+
+        onCreate(db);
 
     }
 
