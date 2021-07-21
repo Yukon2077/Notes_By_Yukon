@@ -3,7 +3,7 @@
     <array name="theme_values">
         <item>Light</item>
         <item>Dark</item>
-        <item>System_Default</item>
+        <item>System Default</item>
     </array>
 
 </resources>

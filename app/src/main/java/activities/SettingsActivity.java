@@ -9,8 +9,10 @@ import android.view.MenuItem;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
 import androidx.preference.CheckBoxPreference;
+import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
@@ -24,7 +26,6 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        MainActivity.setAppTheme(this);
         setContentView(R.layout.settings_activity);
         if (savedInstanceState == null) {
             getSupportFragmentManager()
@@ -51,19 +52,28 @@ public class SettingsActivity extends AppCompatActivity {
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey);
 
-            CheckBoxPreference checkBoxPreference = findPreference("theme_checkbox");
-            checkBoxPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+            ListPreference listPreference = findPreference("theme_list");
+            listPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 @Override
-                public boolean onPreferenceClick(Preference preference) {
-                    /*getActivity().recreate();*/
-                    TaskStackBuilder.create(getActivity())
-                            .addNextIntent(new Intent(getActivity(), MainActivity.class))
-                            .addNextIntent(getActivity().getIntent())
-                            .startActivities();
+                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                    switch (newValue.toString()) {
 
-                    return false;
+                        case "Light":
+                            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                            break;
+
+                        case "Dark":
+                            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                            break;
+
+                        case "System Default":
+                            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+                            break;
+                    }
+                    return true;
                 }
             });
+
 
         }
 

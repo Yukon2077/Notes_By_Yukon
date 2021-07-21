@@ -2,17 +2,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <PreferenceCategory android:title="Personalization">
 
-        <CheckBoxPreference
+        <!--<CheckBoxPreference
             android:defaultValue="false"
             android:key="theme_checkbox"
-            android:title="Use Dark Mode" />
+            android:title="Use Dark Mode" />-->
 
-        <!--<ListPreference
-            android:defaultValue="1"
+        <ListPreference
+            android:defaultValue="System Default"
             android:entries="@array/theme_values"
             android:entryValues="@array/theme_values"
             android:key="theme_list"
-            android:title="Theme" />-->
+            android:title="Theme" />
 
     </PreferenceCategory>
 

@@ -2,6 +2,7 @@ package activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
 import androidx.preference.CheckBoxPreference;
 import androidx.preference.PreferenceManager;
@@ -39,7 +40,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setAppTheme(this);
         setContentView(R.layout.activity_main);
 
         toolbar = findViewById(R.id.toolbar);
@@ -71,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(this,WriteActivity.class);
             intent.putExtra("ENTRY",entry);
             intent.putExtra("ID",id);
+            intent.putExtra("FROM_WHERE","MAIN");
             startActivity(intent);
         }
 
@@ -102,7 +103,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onRestart() {
         entryAdapter.swapCursor(notesSQLiteHelper.getAllItems());
-        setAppTheme(this);
         super.onRestart();
     }
 
@@ -110,22 +110,6 @@ public class MainActivity extends AppCompatActivity {
         SQLiteDatabase db = notesSQLiteHelper.getWritableDatabase();
         db.delete("ENTRIES","_id = ?", new String[]{String.valueOf(id)});
         entryAdapter.swapCursor(notesSQLiteHelper.getAllItems());
-    }
-
-    public static void setAppTheme(Context context){
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        Boolean theme = sharedPreferences.getBoolean("theme_checkbox",false);
-        /*Toast.makeText(getApplicationContext(), theme + "",
-                Toast.LENGTH_LONG).show();*/
-
-        if (theme) {
-            context.setTheme(R.style.Theme_Notes_Dark);
-
-        } else {
-            context.setTheme(R.style.Theme_Notes_Light);
-        }
-
-
     }
 
 }

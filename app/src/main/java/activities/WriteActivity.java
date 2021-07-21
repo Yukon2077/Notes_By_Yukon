@@ -2,11 +2,12 @@ package activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.content.ContentValues;
-import android.content.Intent;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
@@ -38,7 +39,6 @@ public class WriteActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        MainActivity.setAppTheme(this);
         setContentView(R.layout.activity_write);
 
         id = -1;
@@ -57,30 +57,25 @@ public class WriteActivity extends AppCompatActivity {
         sharedPreferences = this.getSharedPreferences("com.yukon.notes.Last_Entry",MODE_PRIVATE);
         editor = sharedPreferences.edit();
 
-
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             id = extras.getInt("ID");
             entry = extras.getString("ENTRY");
             editText.setText(entry);
+            if (extras.getString("FROM_WHERE").equals("MAIN")){
+                entry = "";
+            }
         }
 
     }
 
     @Override
     protected void onPause() {
-
-
         editor.putString("last_entry",editText.getText().toString().trim());
         editor.putInt("last_id",id);
-
         editor.apply();
         super.onPause();
     }
-
-
-
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -92,8 +87,12 @@ public class WriteActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
             case android.R.id.home:
-                save();
-                finish();
+                if (editText.getText().toString().trim().equals(entry)) {
+                    editText.setText("");
+                    finish();
+                } else {
+                    warnNotSaved();
+                }
                 return true;
             case R.id.save:
                 save();
@@ -106,7 +105,9 @@ public class WriteActivity extends AppCompatActivity {
 
     public void save(){
 
-        if (editText.getText().toString().trim().equals("")) {
+        if (editText.getText().toString().trim().equals(entry)) {
+            editText.setText("");
+            finish();
             return;
         }
         notesSQLiteHelper = new NotesSQLiteHelper(this);
@@ -117,8 +118,6 @@ public class WriteActivity extends AppCompatActivity {
                 notesSQLiteHelper.insertEntry(db, date, time, entry);
             } else{
                 ContentValues contentValues = new ContentValues();
-                contentValues.put("DATE",date);
-                contentValues.put("TIME",time);
                 contentValues.put("ENTRY",entry);
                 db.update("ENTRIES",contentValues,"_id = ?", new String[]{ String.valueOf(id) } );
 
@@ -133,6 +132,7 @@ public class WriteActivity extends AppCompatActivity {
         }
 
     }
+
     public static String getTime() {
         SimpleDateFormat timeFormat = new SimpleDateFormat(
                 "HH:mm", Locale.getDefault());
@@ -149,7 +149,39 @@ public class WriteActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        save();
-        super.onBackPressed();
+        if (editText.getText().toString().trim().equals(entry)) {
+            editText.setText("");
+            super.onBackPressed();
+        } else {
+            warnNotSaved();
+        }
+    }
+
+    public void warnNotSaved(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Save & Exit");
+        builder.setMessage("Do you want to save?");
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                save();
+            }
+        });
+        builder.setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                editText.setText("");
+                finish();
+            }
+        });
+        builder.setCancelable(true);
+        builder.show();
+
     }
 }
