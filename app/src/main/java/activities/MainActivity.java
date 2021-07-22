@@ -40,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setAppTheme();
         setContentView(R.layout.activity_main);
 
         toolbar = findViewById(R.id.toolbar);
@@ -110,6 +111,27 @@ public class MainActivity extends AppCompatActivity {
         SQLiteDatabase db = notesSQLiteHelper.getWritableDatabase();
         db.delete("ENTRIES","_id = ?", new String[]{String.valueOf(id)});
         entryAdapter.swapCursor(notesSQLiteHelper.getAllItems());
+    }
+    
+    public void setAppTheme(){
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String theme = sharedPreferences.getString("theme_list","System Default");
+
+        switch (theme) {
+
+            case "Light":
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                break;
+
+            case "Dark":
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                break;
+
+            case "System Default":
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+                break;
+        }
+
     }
 
 }
