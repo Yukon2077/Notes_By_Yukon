@@ -1,24 +1,32 @@
 package activities;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.EditText;
 
 import com.google.android.material.navigation.NavigationView;
 import com.yukon.notes.R;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import adapters.EntryAdapter;
 import database.NotesSQLiteHelper;
@@ -33,6 +41,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static String CURRENT_TABLE = "ENTRIES";
     public DrawerLayout drawerLayout;
     public NavigationView navigationView;
+    public Menu navMenu;
+    public List<String> tables = new ArrayList<>();
 
 
     @Override
@@ -46,6 +56,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         notesSQLiteHelper = new NotesSQLiteHelper(this);
         db = notesSQLiteHelper.getWritableDatabase();
+        Cursor cursor = notesSQLiteHelper.getAllTables(db);
+        if(cursor.moveToFirst()){
+            do{
+                tables.add(cursor.getString(cursor.getColumnIndex("TABLE_NAME")));
+            }while (cursor.moveToNext());
+        }
 
         entryAdapter = new EntryAdapter(this, notesSQLiteHelper.getAllItems(db, CURRENT_TABLE));
         recyclerView = findViewById(R.id.recyclerview);
@@ -67,6 +83,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navigationView = findViewById(R.id.navigationView);
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView.setNavigationItemSelectedListener(this);
+        navMenu = navigationView.getMenu();
+        for (int i = 0; i < tables.size(); i++)
+        {
+            String text = tables.get(i);
+            int resourceId = this.getResources().getIdentifier(text, "string", this.getPackageName());
+            navMenu.add(R.id.group, resourceId,1,text);
+        }
+
+
 
     }
 
@@ -117,7 +142,41 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.nav_add:
+                addTableDialog();
+                break;
+        }
+        return true;
+    }
+    public void addTableDialog(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Add Notebook");
+        builder.setMessage("Enter a name");
+        EditText input = new EditText(this);
+        input.setPadding(12,0,12,0);
+        builder.setView(input);
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                notesSQLiteHelper.addTable(db, String.valueOf(input.getText()));
 
-        return false;
+            }
+        });
+        builder.setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                finish();
+            }
+        });
+        builder.setCancelable(true);
+        builder.show();
+
     }
 }

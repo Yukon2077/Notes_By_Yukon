@@ -4,4 +4,8 @@
         android:id="@+id/nav_add"
         android:title="Add New Notebook"
         android:icon="@drawable/ic_add"/>
+
+    <group android:id="@+id/group" android:checkableBehavior="single">
+
+    </group>
 </menu>
