@@ -59,7 +59,6 @@ public class EntryAdapter extends RecyclerView.Adapter <EntryAdapter.EntryViewHo
                 Intent intent = new Intent(mContext, WriteActivity.class);
                 intent.putExtra("ID",id);
                 intent.putExtra("ENTRY",entry);
-                intent.putExtra("FROM_WHERE","ADAPTER");
                 mContext.startActivity(intent);
             }
         });

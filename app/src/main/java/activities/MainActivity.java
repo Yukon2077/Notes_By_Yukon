@@ -4,23 +4,17 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
-import androidx.preference.CheckBoxPreference;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
-import android.view.View;
-import android.widget.Toast;
 
 import com.yukon.notes.R;
 
@@ -29,12 +23,11 @@ import database.NotesSQLiteHelper;
 
 public class MainActivity extends AppCompatActivity {
 
-    Toolbar toolbar;
-    RecyclerView recyclerView;
-    EntryAdapter entryAdapter;
-    NotesSQLiteHelper notesSQLiteHelper;
-    String entry;
-    Integer id;
+    public Toolbar toolbar;
+    public RecyclerView recyclerView;
+    public EntryAdapter entryAdapter;
+    public NotesSQLiteHelper notesSQLiteHelper;
+    public SQLiteDatabase db;
     public static String CURRENT_TABLE = "ENTRIES";
 
 
@@ -48,7 +41,8 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         notesSQLiteHelper = new NotesSQLiteHelper(this);
-        SQLiteDatabase db = notesSQLiteHelper.getReadableDatabase();
+        db = notesSQLiteHelper.getWritableDatabase();
+
         entryAdapter = new EntryAdapter(this, notesSQLiteHelper.getAllItems(db, CURRENT_TABLE));
         recyclerView = findViewById(R.id.recyclerview);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -61,22 +55,10 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                removeItem((Integer) viewHolder.itemView.getTag());
+                notesSQLiteHelper.deleteEntry(db, (Integer) viewHolder.itemView.getTag());
+                entryAdapter.swapCursor(notesSQLiteHelper.getAllItems(db, CURRENT_TABLE));
             }
         }).attachToRecyclerView(recyclerView);
-
-        SharedPreferences sharedPreferences = this.getSharedPreferences("com.yukon.notes.Last_Entry",MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-
-        entry = sharedPreferences.getString("last_entry","");
-        id = sharedPreferences.getInt("last_id",-1);
-        if( !entry.equals("")){
-            Intent intent = new Intent(this,WriteActivity.class);
-            intent.putExtra("ENTRY",entry);
-            intent.putExtra("ID",id);
-            intent.putExtra("FROM_WHERE","MAIN");
-            startActivity(intent);
-        }
     }
 
     @Override
@@ -103,17 +85,11 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onRestart() {
-        SQLiteDatabase db = notesSQLiteHelper.getReadableDatabase();
+        db = notesSQLiteHelper.getReadableDatabase();
         entryAdapter.swapCursor(notesSQLiteHelper.getAllItems(db, CURRENT_TABLE));
         super.onRestart();
     }
 
-    public void removeItem(Integer id){
-        SQLiteDatabase db = notesSQLiteHelper.getWritableDatabase();
-        db.delete("ENTRIES","_id = ?", new String[]{String.valueOf(id)});
-        entryAdapter.swapCursor(notesSQLiteHelper.getAllItems(db, CURRENT_TABLE));
-    }
-    
     public void setAppTheme(){
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         String theme = sharedPreferences.getString("theme_list","System Default");

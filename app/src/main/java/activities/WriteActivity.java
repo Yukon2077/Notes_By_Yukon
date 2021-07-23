@@ -28,23 +28,19 @@ import database.NotesSQLiteHelper;
 public class WriteActivity extends AppCompatActivity {
 
     public Toolbar toolbar;
-    public String date, time, entry;
+    public String date, time, entry = "";
     public NotesSQLiteHelper notesSQLiteHelper;
     public SQLiteDatabase db;
     public EditText editText;
     public Integer id;
-    public SharedPreferences sharedPreferences;
-    public SharedPreferences.Editor editor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_write);
 
-        id = -1;
         date = getDate();
         time = getTime();
-        entry = "";
 
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -54,27 +50,13 @@ public class WriteActivity extends AppCompatActivity {
 
         editText = findViewById(R.id.editTextEntry);
 
-        sharedPreferences = this.getSharedPreferences("com.yukon.notes.Last_Entry",MODE_PRIVATE);
-        editor = sharedPreferences.edit();
-
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             id = extras.getInt("ID");
             entry = extras.getString("ENTRY");
             editText.setText(entry);
-            if (extras.getString("FROM_WHERE").equals("MAIN")){
-                entry = "";
-            }
         }
 
-    }
-
-    @Override
-    protected void onPause() {
-        editor.putString("last_entry",editText.getText().toString().trim());
-        editor.putInt("last_id",id);
-        editor.apply();
-        super.onPause();
     }
 
     @Override
@@ -87,8 +69,7 @@ public class WriteActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
             case android.R.id.home:
-                if (editText.getText().toString().trim().equals(entry)) {
-                    editText.setText("");
+                if (!savable()) {
                     finish();
                 } else {
                     warnNotSaved();
@@ -103,34 +84,32 @@ public class WriteActivity extends AppCompatActivity {
 
     }
 
+    public Boolean savable(){
+        String text = editText.getText().toString().trim();
+        if (text.equals("") || text.equals(entry)) {
+            return false;
+        }
+        return true;
+    }
+
     public void save(){
 
-        if (editText.getText().toString().trim().equals(entry)) {
-            editText.setText("");
+        if (!savable()) {
             finish();
             return;
         }
         notesSQLiteHelper = new NotesSQLiteHelper(this);
-        try{
             db = notesSQLiteHelper.getWritableDatabase();
             entry = editText.getText().toString();
-            if( id == null || id == -1) {
+            if( id == null ) {
                 notesSQLiteHelper.addEntry(db, MainActivity.CURRENT_TABLE, date, time, entry);
             } else{
                 ContentValues contentValues = new ContentValues();
                 contentValues.put("ENTRY",entry);
                 db.update(MainActivity.CURRENT_TABLE,contentValues,"_id = ?", new String[]{ String.valueOf(id) } );
-
             }
-            editText.setText("");
             db.close();
             finish();
-        }catch (SQLException e){
-            Toast toast = Toast.makeText(this, "Database unavailable", Toast.LENGTH_SHORT);
-            toast.show();
-
-        }
-
     }
 
     public static String getTime() {
@@ -149,8 +128,7 @@ public class WriteActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if (editText.getText().toString().trim().equals(entry)) {
-            editText.setText("");
+        if (!savable()) {
             super.onBackPressed();
         } else {
             warnNotSaved();
@@ -176,7 +154,6 @@ public class WriteActivity extends AppCompatActivity {
         builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                editText.setText("");
                 finish();
             }
         });
