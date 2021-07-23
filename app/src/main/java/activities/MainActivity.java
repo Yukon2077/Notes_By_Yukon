@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -16,12 +17,13 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.google.android.material.navigation.NavigationView;
 import com.yukon.notes.R;
 
 import adapters.EntryAdapter;
 import database.NotesSQLiteHelper;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     public Toolbar toolbar;
     public RecyclerView recyclerView;
@@ -29,6 +31,8 @@ public class MainActivity extends AppCompatActivity {
     public NotesSQLiteHelper notesSQLiteHelper;
     public SQLiteDatabase db;
     public static String CURRENT_TABLE = "ENTRIES";
+    public DrawerLayout drawerLayout;
+    public NavigationView navigationView;
 
 
     @Override
@@ -59,6 +63,11 @@ public class MainActivity extends AppCompatActivity {
                 entryAdapter.swapCursor(notesSQLiteHelper.getAllItems(db, CURRENT_TABLE));
             }
         }).attachToRecyclerView(recyclerView);
+
+        navigationView = findViewById(R.id.navigationView);
+        drawerLayout = findViewById(R.id.drawer_layout);
+        navigationView.setNavigationItemSelectedListener(this);
+
     }
 
     @Override
@@ -104,5 +113,11 @@ public class MainActivity extends AppCompatActivity {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
                 break;
         }
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+
+        return false;
     }
 }
