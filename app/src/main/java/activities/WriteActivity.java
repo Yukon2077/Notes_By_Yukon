@@ -119,7 +119,7 @@ public class WriteActivity extends AppCompatActivity {
             } else{
                 ContentValues contentValues = new ContentValues();
                 contentValues.put("ENTRY",entry);
-                db.update("ENTRIES",contentValues,"_id = ?", new String[]{ String.valueOf(id) } );
+                db.update(MainActivity.CURRENT_TABLE,contentValues,"_id = ?", new String[]{ String.valueOf(id) } );
 
             }
             editText.setText("");

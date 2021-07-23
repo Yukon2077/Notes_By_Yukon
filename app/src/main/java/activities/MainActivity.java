@@ -35,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
     NotesSQLiteHelper notesSQLiteHelper;
     String entry;
     Integer id;
+    public static String CURRENT_TABLE="ENTRIES";
 
 
     @Override
@@ -45,9 +46,10 @@ public class MainActivity extends AppCompatActivity {
 
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        NotesSQLiteHelper.TB_NAME = "Hello";
 
         notesSQLiteHelper = new NotesSQLiteHelper(this);
-        entryAdapter = new EntryAdapter(this, notesSQLiteHelper.getAllItems());
+        entryAdapter = new EntryAdapter(this, notesSQLiteHelper.getAllItems(CURRENT_TABLE));
         recyclerView = findViewById(R.id.recyclerview);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(entryAdapter);
@@ -103,14 +105,14 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onRestart() {
-        entryAdapter.swapCursor(notesSQLiteHelper.getAllItems());
+        entryAdapter.swapCursor(notesSQLiteHelper.getAllItems(CURRENT_TABLE));
         super.onRestart();
     }
 
     public void removeItem(Integer id){
         SQLiteDatabase db = notesSQLiteHelper.getWritableDatabase();
         db.delete("ENTRIES","_id = ?", new String[]{String.valueOf(id)});
-        entryAdapter.swapCursor(notesSQLiteHelper.getAllItems());
+        entryAdapter.swapCursor(notesSQLiteHelper.getAllItems(CURRENT_TABLE));
     }
     
     public void setAppTheme(){
