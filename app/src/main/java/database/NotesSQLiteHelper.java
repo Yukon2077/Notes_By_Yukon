@@ -85,4 +85,11 @@ public class NotesSQLiteHelper extends SQLiteOpenHelper {
                 "_id DESC");
 
     }
+
+    public void deleteEntry(SQLiteDatabase db, Integer id){
+        db.delete("ENTRIES",
+                "_id = ?",
+                new String[]{ String.valueOf( id ) });
+    }
+
 }
