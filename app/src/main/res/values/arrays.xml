@@ -1,9 +1,9 @@
 <resources>
 
     <array name="theme_values">
+        <item>System Default</item>
         <item>Light</item>
         <item>Dark</item>
-        <item>System Default</item>
     </array>
 
 </resources>
