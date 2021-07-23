@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
     NotesSQLiteHelper notesSQLiteHelper;
     String entry;
     Integer id;
-    public static String CURRENT_TABLE="ENTRIES";
+    public static String CURRENT_TABLE = "ENTRIES";
 
 
     @Override
@@ -46,10 +46,10 @@ public class MainActivity extends AppCompatActivity {
 
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        NotesSQLiteHelper.TB_NAME = "Hello";
 
         notesSQLiteHelper = new NotesSQLiteHelper(this);
-        entryAdapter = new EntryAdapter(this, notesSQLiteHelper.getAllItems(CURRENT_TABLE));
+        SQLiteDatabase db = notesSQLiteHelper.getReadableDatabase();
+        entryAdapter = new EntryAdapter(this, notesSQLiteHelper.getAllItems(db, CURRENT_TABLE));
         recyclerView = findViewById(R.id.recyclerview);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(entryAdapter);
@@ -77,7 +77,6 @@ public class MainActivity extends AppCompatActivity {
             intent.putExtra("FROM_WHERE","MAIN");
             startActivity(intent);
         }
-
     }
 
     @Override
@@ -100,40 +99,34 @@ public class MainActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
-
     }
 
     @Override
     protected void onRestart() {
-        entryAdapter.swapCursor(notesSQLiteHelper.getAllItems(CURRENT_TABLE));
+        SQLiteDatabase db = notesSQLiteHelper.getReadableDatabase();
+        entryAdapter.swapCursor(notesSQLiteHelper.getAllItems(db, CURRENT_TABLE));
         super.onRestart();
     }
 
     public void removeItem(Integer id){
         SQLiteDatabase db = notesSQLiteHelper.getWritableDatabase();
         db.delete("ENTRIES","_id = ?", new String[]{String.valueOf(id)});
-        entryAdapter.swapCursor(notesSQLiteHelper.getAllItems(CURRENT_TABLE));
+        entryAdapter.swapCursor(notesSQLiteHelper.getAllItems(db, CURRENT_TABLE));
     }
     
     public void setAppTheme(){
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         String theme = sharedPreferences.getString("theme_list","System Default");
-
         switch (theme) {
-
             case "Light":
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
                 break;
-
             case "Dark":
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
                 break;
-
             case "System Default":
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
                 break;
         }
-
     }
-
 }

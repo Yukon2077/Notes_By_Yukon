@@ -115,7 +115,7 @@ public class WriteActivity extends AppCompatActivity {
             db = notesSQLiteHelper.getWritableDatabase();
             entry = editText.getText().toString();
             if( id == null || id == -1) {
-                notesSQLiteHelper.insertEntry(db, date, time, entry);
+                notesSQLiteHelper.addEntry(db, MainActivity.CURRENT_TABLE, date, time, entry);
             } else{
                 ContentValues contentValues = new ContentValues();
                 contentValues.put("ENTRY",entry);
