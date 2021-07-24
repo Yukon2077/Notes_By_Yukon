@@ -1,6 +1,7 @@
 package activities;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
@@ -12,6 +13,7 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -20,7 +22,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 
 import com.google.android.material.navigation.NavigationView;
 import com.yukon.notes.R;
@@ -34,6 +38,7 @@ import database.NotesSQLiteHelper;
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     public Toolbar toolbar;
+    public ActionBar actionBar;
     public RecyclerView recyclerView;
     public EntryAdapter entryAdapter;
     public NotesSQLiteHelper notesSQLiteHelper;
@@ -53,6 +58,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
+
 
         notesSQLiteHelper = new NotesSQLiteHelper(this);
         db = notesSQLiteHelper.getWritableDatabase();
@@ -84,12 +93,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView.setNavigationItemSelectedListener(this);
         navMenu = navigationView.getMenu();
+
         for (int i = 0; i < tables.size(); i++)
         {
             String text = tables.get(i);
             int resourceId = this.getResources().getIdentifier(text, "string", this.getPackageName());
             navMenu.add(R.id.group, resourceId,1,text);
         }
+        navMenu.setGroupCheckable(R.id.group,true,true);
+
+        navMenu.getItem(1).setChecked(true);
 
 
 
@@ -104,6 +117,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
+            case android.R.id.home:
+                drawerLayout.openDrawer(GravityCompat.START);
+                return true;
             case R.id.create:
                 Intent create = new Intent(this, WriteActivity.class);
                 startActivity(create);
@@ -122,6 +138,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         db = notesSQLiteHelper.getReadableDatabase();
         entryAdapter.swapCursor(notesSQLiteHelper.getAllItems(db, CURRENT_TABLE));
         super.onRestart();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(drawerLayout.isDrawerOpen(GravityCompat.START)){
+            drawerLayout.closeDrawer(GravityCompat.START);
+        }else{
+            super.onBackPressed();
+        }
     }
 
     public void setAppTheme(){
@@ -144,22 +169,33 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public boolean onNavigationItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.nav_add:
-                addTableDialog();
+                addTableDialog(this);
                 break;
+            /*default:
+                item.setChecked(true);*/
         }
         return true;
     }
-    public void addTableDialog(){
+    public void addTableDialog(Context context){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Add Notebook");
         builder.setMessage("Enter a name");
         EditText input = new EditText(this);
-        input.setPadding(12,0,12,0);
-        builder.setView(input);
-        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+        FrameLayout container = new FrameLayout(this);
+        FrameLayout.LayoutParams params = new  FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.leftMargin = getResources().getDimensionPixelSize(R.dimen.dialog_margin);
+        params.rightMargin = getResources().getDimensionPixelSize(R.dimen.dialog_margin);
+        input.setLayoutParams(params);
+        container.addView(input);
+        builder.setView(container);
+        builder.setPositiveButton("Create", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                notesSQLiteHelper.addTable(db, String.valueOf(input.getText()));
+                String table_name = String.valueOf(input.getText());
+                notesSQLiteHelper.addTable(db, table_name);
+                int resourceId = context.getResources().getIdentifier(table_name, "string", context.getPackageName());
+                navMenu.add(R.id.group, resourceId,1,table_name);
+                navMenu.setGroupCheckable(R.id.group,true,true);
 
             }
         });
@@ -169,14 +205,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 dialog.cancel();
             }
         });
-        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+        /*builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 finish();
             }
-        });
+        });*/
         builder.setCancelable(true);
         builder.show();
 
     }
+
 }

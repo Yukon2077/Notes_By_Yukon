@@ -5,7 +5,9 @@
         android:title="Add New Notebook"
         android:icon="@drawable/ic_add"/>
 
-    <group android:id="@+id/group" android:checkableBehavior="single">
+    <group android:id="@+id/group"
+        android:checkableBehavior="single"
+        android:orderInCategory="1">
 
     </group>
 </menu>
