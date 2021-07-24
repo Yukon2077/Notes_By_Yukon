@@ -22,6 +22,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -93,18 +94,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView.setNavigationItemSelectedListener(this);
         navMenu = navigationView.getMenu();
-
         for (int i = 0; i < tables.size(); i++)
         {
             String text = tables.get(i);
             int resourceId = this.getResources().getIdentifier(text, "string", this.getPackageName());
             navMenu.add(R.id.group, resourceId,1,text);
         }
-        navMenu.setGroupCheckable(R.id.group,true,true);
-
+        navMenu.setGroupCheckable(R.id.group,true,false);
         navMenu.getItem(1).setChecked(true);
-
-
+        toolbar.setTitle(navMenu.getItem(1).getTitle());
 
     }
 
@@ -171,11 +169,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case R.id.nav_add:
                 addTableDialog(this);
                 break;
-            /*default:
-                item.setChecked(true);*/
+            default:
+                if(item!=null){
+                    String text = String.valueOf(item.getTitle());
+                    CURRENT_TABLE = text;
+                    toolbar.setTitle(text);
+                    db = notesSQLiteHelper.getReadableDatabase();
+                    entryAdapter.swapCursor(notesSQLiteHelper.getAllItems(db, CURRENT_TABLE));
+                }
         }
         return true;
     }
+
     public void addTableDialog(Context context){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Add Notebook");
@@ -205,12 +210,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 dialog.cancel();
             }
         });
-        /*builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                finish();
-            }
-        });*/
         builder.setCancelable(true);
         builder.show();
 
