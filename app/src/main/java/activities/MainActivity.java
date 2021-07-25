@@ -22,7 +22,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.SubMenu;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -49,6 +48,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public NavigationView navigationView;
     public Menu navMenu;
     public List<String> tables = new ArrayList<>();
+    public SharedPreferences sharedPreferences;
+    public SharedPreferences.Editor spEdit;
 
 
     @Override
@@ -62,6 +63,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
+        sharedPreferences = getSharedPreferences("com.yukon.notes.sp",MODE_PRIVATE);
+        spEdit = sharedPreferences.edit();
+        String title = sharedPreferences.getString("LAST_TABLE","ENTRIES");
+        Integer j = sharedPreferences.getInt("LAST_ID",0);
+        actionBar.setTitle(title);
+        CURRENT_TABLE = title;
 
 
         notesSQLiteHelper = new NotesSQLiteHelper(this);
@@ -97,12 +104,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         for (int i = 0; i < tables.size(); i++)
         {
             String text = tables.get(i);
-            int resourceId = this.getResources().getIdentifier(text, "string", this.getPackageName());
-            navMenu.add(R.id.group, resourceId,1,text);
+            navMenu.add(R.id.group, i,1,text);
         }
-        navMenu.setGroupCheckable(R.id.group,true,false);
-        navMenu.getItem(1).setChecked(true);
-        toolbar.setTitle(navMenu.getItem(1).getTitle());
+        navMenu.setGroupCheckable(R.id.group,true,true);
+        navMenu.findItem(j).setChecked(true);
+
+
 
     }
 
@@ -173,9 +180,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 if(item!=null){
                     String text = String.valueOf(item.getTitle());
                     CURRENT_TABLE = text;
-                    toolbar.setTitle(text);
+                    actionBar.setTitle(text);
                     db = notesSQLiteHelper.getReadableDatabase();
                     entryAdapter.swapCursor(notesSQLiteHelper.getAllItems(db, CURRENT_TABLE));
+                    spEdit.putString("LAST_TABLE",text);
+                    spEdit.putInt("LAST_ID",item.getItemId());
+                    spEdit.apply();
+                    drawerLayout.closeDrawer(GravityCompat.START);
                 }
         }
         return true;
