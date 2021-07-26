@@ -35,6 +35,8 @@ import java.util.List;
 import adapters.EntryAdapter;
 import database.NotesSQLiteHelper;
 
+import static database.NotesSQLiteHelper.DEFAULT_TABLE;
+
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     public Toolbar toolbar;
@@ -43,10 +45,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public EntryAdapter entryAdapter;
     public NotesSQLiteHelper notesSQLiteHelper;
     public SQLiteDatabase db;
-    public static String CURRENT_TABLE = "ENTRIES";
+    public static String CURRENT_TABLE = DEFAULT_TABLE;
     public DrawerLayout drawerLayout;
     public NavigationView navigationView;
     public Menu navMenu;
+    public Integer i;
     public List<String> tables = new ArrayList<>();
     public SharedPreferences sharedPreferences;
     public SharedPreferences.Editor spEdit;
@@ -65,8 +68,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         actionBar.setHomeAsUpIndicator(R.drawable.ic_menu);
         sharedPreferences = getSharedPreferences("com.yukon.notes.sp",MODE_PRIVATE);
         spEdit = sharedPreferences.edit();
-        String title = sharedPreferences.getString("LAST_TABLE","ENTRIES");
-        Integer j = sharedPreferences.getInt("LAST_ID",0);
+        String title = sharedPreferences.getString("LAST_TABLE",DEFAULT_TABLE);
+        Integer j = sharedPreferences.getInt("LAST_ID",1);
         actionBar.setTitle(title);
         CURRENT_TABLE = title;
 
@@ -92,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                notesSQLiteHelper.deleteEntry(db, (Integer) viewHolder.itemView.getTag());
+                notesSQLiteHelper.deleteEntry(db, CURRENT_TABLE, (Integer) viewHolder.itemView.getTag());
                 entryAdapter.swapCursor(notesSQLiteHelper.getAllItems(db, CURRENT_TABLE));
             }
         }).attachToRecyclerView(recyclerView);
@@ -101,13 +104,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView.setNavigationItemSelectedListener(this);
         navMenu = navigationView.getMenu();
-        for (int i = 0; i < tables.size(); i++)
+        for (i = 0; i < tables.size(); i++)
         {
             String text = tables.get(i);
             navMenu.add(R.id.group, i,1,text);
         }
         navMenu.setGroupCheckable(R.id.group,true,true);
-        navMenu.findItem(j).setChecked(true);
+        navMenu.getItem(j).setChecked(true);
 
 
 
@@ -194,7 +197,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     public void addTableDialog(Context context){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Add Notebook");
+        builder.setTitle("Add New File");
         builder.setMessage("Enter a name");
         EditText input = new EditText(this);
         FrameLayout container = new FrameLayout(this);
@@ -209,8 +212,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public void onClick(DialogInterface dialog, int which) {
                 String table_name = String.valueOf(input.getText());
                 notesSQLiteHelper.addTable(db, table_name);
-                int resourceId = context.getResources().getIdentifier(table_name, "string", context.getPackageName());
-                navMenu.add(R.id.group, resourceId,1,table_name);
+                i = i + 1;
+                navMenu.add(R.id.group, i,1,table_name);
                 navMenu.setGroupCheckable(R.id.group,true,true);
 
             }

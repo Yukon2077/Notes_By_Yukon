@@ -15,6 +15,7 @@ public class NotesSQLiteHelper extends SQLiteOpenHelper {
 
     private static final String DB_NAME = "NotesSQL";
     private static final int DB_VERSION = 1;
+    public static final String DEFAULT_TABLE = "ENTRIES";
 
     public NotesSQLiteHelper(@Nullable Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -23,11 +24,11 @@ public class NotesSQLiteHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE TB_LIST(_id INTEGER PRIMARY KEY AUTOINCREMENT, TABLE_NAME TEXT);" );
-        addTable(db, "ENTRIES");
-        addEntry(db, "ENTRIES", WriteActivity.getDate(), WriteActivity.getTime(),"Swipe left or right to delete entries");
-        addEntry(db, "ENTRIES", WriteActivity.getDate(), WriteActivity.getTime(),"That's it, I guess.");
-        addEntry(db, "ENTRIES", WriteActivity.getDate(), WriteActivity.getTime(),"An App to write and save notes for later.");
-        addEntry(db, "ENTRIES", WriteActivity.getDate(), WriteActivity.getTime(),"Notes");
+        addTable(db, DEFAULT_TABLE);
+        addEntry(db, DEFAULT_TABLE, WriteActivity.getDate(), WriteActivity.getTime(),"Swipe left or right to delete entries");
+        addEntry(db, DEFAULT_TABLE, WriteActivity.getDate(), WriteActivity.getTime(),"That's it, I guess.");
+        addEntry(db, DEFAULT_TABLE, WriteActivity.getDate(), WriteActivity.getTime(),"An App to write and save notes for later.");
+        addEntry(db, DEFAULT_TABLE, WriteActivity.getDate(), WriteActivity.getTime(),"Notes");
     }
 
     @Override
@@ -35,21 +36,22 @@ public class NotesSQLiteHelper extends SQLiteOpenHelper {
         Cursor cursor = getAllTables(db);
         if(cursor.moveToFirst()){
             do{
-                db.execSQL("DROP TABLE IF EXISTS " + cursor.getString(cursor.getColumnIndex("TABLE_NAME")));
+                deleteTable(db, cursor.getString(cursor.getColumnIndex("TABLE_NAME")));
             }while (cursor.moveToNext());
         }
         db.execSQL("DROP TABLE IF EXISTS TB_LIST");
+        deleteTable(db, "TB_LIST");
         onCreate(db);
     }
 
     public void addTable(SQLiteDatabase db, String table_name){
-        db.execSQL("CREATE TABLE " + table_name + "("
+        db.execSQL("CREATE TABLE " + "\"" + table_name + "\"" +"("
                 + "_id INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + "DATE DATE, "
                 + "TIME TIME, "
                 + "ENTRY TEXT);");
         ContentValues contentValues = new ContentValues();
-        contentValues.put("TABLE_NAME", table_name);
+        contentValues.put("TABLE_NAME",table_name);
         db.insert("TB_LIST",null, contentValues);
     }
 
@@ -62,7 +64,7 @@ public class NotesSQLiteHelper extends SQLiteOpenHelper {
         contentValues.put("DATE",date);
         contentValues.put("TIME",time);
         contentValues.put("ENTRY",entry);
-        db.insert(table_name,null, contentValues);
+        db.insert("\"" + table_name + "\"",null, contentValues);
     }
 
     public Cursor getAllTables(SQLiteDatabase db){
@@ -76,7 +78,7 @@ public class NotesSQLiteHelper extends SQLiteOpenHelper {
     }
 
     public Cursor getAllItems(SQLiteDatabase db, String table_name){
-        return  db.query(table_name,
+        return  db.query("\"" + table_name + "\"",
                 null,
                 null,
                 null,
@@ -86,10 +88,15 @@ public class NotesSQLiteHelper extends SQLiteOpenHelper {
 
     }
 
-    public void deleteEntry(SQLiteDatabase db, Integer id){
-        db.delete("ENTRIES",
+    public void deleteEntry(SQLiteDatabase db, String table_name, Integer id){
+        db.delete("\"" + table_name + "\"",
                 "_id = ?",
                 new String[]{ String.valueOf( id ) });
+    }
+
+    public void deleteTable(SQLiteDatabase db, String table_name){
+        db.execSQL("DROP TABLE IF EXISTS " + "\"" + table_name + "\"");
+
     }
 
 }
