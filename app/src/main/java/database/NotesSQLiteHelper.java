@@ -15,6 +15,7 @@ public class NotesSQLiteHelper extends SQLiteOpenHelper {
 
     private static final String DB_NAME = "NotesSQL";
     private static final int DB_VERSION = 1;
+    public static final String LIST_OF_ALL_TABLES = "TB_LIST";
     public static final String DEFAULT_TABLE = "ENTRIES";
 
     public NotesSQLiteHelper(@Nullable Context context) {
@@ -23,7 +24,7 @@ public class NotesSQLiteHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE TB_LIST(_id INTEGER PRIMARY KEY AUTOINCREMENT, TABLE_NAME TEXT);" );
+        db.execSQL("CREATE TABLE TB_LIST(_id INTEGER PRIMARY KEY AUTOINCREMENT, TABLE_NAME TEXT UNIQUE );" );
         addTable(db, DEFAULT_TABLE);
         addEntry(db, DEFAULT_TABLE, WriteActivity.getDate(), WriteActivity.getTime(),"Swipe left or right to delete entries");
         addEntry(db, DEFAULT_TABLE, WriteActivity.getDate(), WriteActivity.getTime(),"That's it, I guess.");
@@ -96,6 +97,9 @@ public class NotesSQLiteHelper extends SQLiteOpenHelper {
 
     public void deleteTable(SQLiteDatabase db, String table_name){
         db.execSQL("DROP TABLE IF EXISTS " + "\"" + table_name + "\"");
+        db.delete("TB_LIST",
+                "_id = ?",
+                new String[]{ table_name });
 
     }
 

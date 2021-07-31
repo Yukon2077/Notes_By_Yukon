@@ -110,7 +110,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             navMenu.add(R.id.group, i,1,text);
         }
         navMenu.setGroupCheckable(R.id.group,true,true);
-        navMenu.getItem(j).setChecked(true);
+        navMenu.findItem(j).setChecked(true);
 
 
 
