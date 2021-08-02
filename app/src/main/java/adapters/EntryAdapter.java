@@ -30,7 +30,7 @@ public class EntryAdapter extends RecyclerView.Adapter <EntryAdapter.EntryViewHo
     @Override
     public EntryAdapter.EntryViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater layoutInflater = LayoutInflater.from(mContext);
-        View view = layoutInflater.inflate(R.layout.recyclerview_cardview,parent,false);
+        View view = layoutInflater.inflate(R.layout.recyclerview_entry_cardview,parent,false);
         return new EntryViewHolder(view);
     }
 

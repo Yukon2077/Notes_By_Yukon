@@ -102,11 +102,11 @@ public class WriteActivity extends AppCompatActivity {
             db = notesSQLiteHelper.getWritableDatabase();
             entry = editText.getText().toString();
             if( id == null ) {
-                notesSQLiteHelper.addEntry(db, MainActivity.CURRENT_TABLE, date, time, entry);
+                notesSQLiteHelper.addEntry(db, EntryActivity.CURRENT_TABLE, date, time, entry);
             } else{
                 ContentValues contentValues = new ContentValues();
                 contentValues.put("ENTRY",entry);
-                db.update(MainActivity.CURRENT_TABLE,contentValues,"_id = ?", new String[]{ String.valueOf(id) } );
+                db.update(EntryActivity.CURRENT_TABLE,contentValues,"_id = ?", new String[]{ String.valueOf(id) } );
             }
             db.close();
             finish();
