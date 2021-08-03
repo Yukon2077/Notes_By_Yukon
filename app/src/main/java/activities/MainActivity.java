@@ -26,6 +26,7 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.yukon.notes.R;
 
@@ -98,6 +99,50 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void setAppTheme(){
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String theme = sharedPreferences.getString("theme_list","System Default");
+        switch (theme) {
+            case "Light":
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                break;
+            case "Dark":
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                break;
+            case "System Default":
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+                break;
+        }
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        AdapterView.AdapterContextMenuInfo info =
+                (AdapterView.AdapterContextMenuInfo) menuInfo;
+        selectedWord = ((TextView) info.targetView).getText().toString();
+        menu.setHeaderTitle(selectedWord);
+        menu.setHeaderIcon(R.drawable.ic_menu);
+        menu.add("Delete");
+        menu.add("Rename");
+    }
+
+    @Override
+    public boolean onContextItemSelected(@NonNull MenuItem item) {
+        String title = String.valueOf(item.getTitle());
+        switch (title){
+            case "Delete":
+                notesSQLiteHelper.deleteTable(db,selectedWord);
+                StringArray.remove(selectedWord);
+                adapter.notifyDataSetChanged();
+                return true;
+            case "Rename":
+                renameTableDialog(selectedWord);
+                return true;
+        }
+        return super.onContextItemSelected(item);
+    }
+
     public void addTableDialog(){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Add New File");
@@ -131,46 +176,42 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void setAppTheme(){
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String theme = sharedPreferences.getString("theme_list","System Default");
-        switch (theme) {
-            case "Light":
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-                break;
-            case "Dark":
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-                break;
-            case "System Default":
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
-                break;
-        }
-    }
-
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-        AdapterView.AdapterContextMenuInfo info =
-                (AdapterView.AdapterContextMenuInfo) menuInfo;
-        selectedWord = ((TextView) info.targetView).getText().toString();
-        menu.setHeaderTitle(selectedWord);
-        menu.setHeaderIcon(R.drawable.ic_menu);
-        menu.add("Delete");
-        /*menu.add("Rename");*/
-    }
-
-    @Override
-    public boolean onContextItemSelected(@NonNull MenuItem item) {
-        String title = String.valueOf(item.getTitle());
-        switch (title){
-            case "Delete":
-                notesSQLiteHelper.deleteTable(db,selectedWord);
-                StringArray.remove(selectedWord);
+    public void renameTableDialog(String table_name){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Rename File");
+        builder.setMessage("Enter a new name");
+        EditText input = new EditText(this);
+        FrameLayout container = new FrameLayout(this);
+        FrameLayout.LayoutParams params = new  FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.leftMargin = getResources().getDimensionPixelSize(R.dimen.dialog_margin);
+        params.rightMargin = getResources().getDimensionPixelSize(R.dimen.dialog_margin);
+        input.setLayoutParams(params);
+        container.addView(input);
+        builder.setView(container);
+        builder.setPositiveButton("Rename", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String new_name = String.valueOf(input.getText());
+                if(table_name.toLowerCase().equals(new_name.toLowerCase())){
+                    Toast.makeText(getApplicationContext(),"New name can't be same as old name",Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                notesSQLiteHelper.renameTable(db, table_name, new_name);
+                StringArray.set(StringArray.indexOf(table_name),new_name);
                 adapter.notifyDataSetChanged();
-                return true;
-            case "Rename":
-                return true;
-        }
-        return super.onContextItemSelected(item);
+
+            }
+        });
+        builder.setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        builder.setCancelable(true);
+        builder.show();
+
     }
+
+
 }

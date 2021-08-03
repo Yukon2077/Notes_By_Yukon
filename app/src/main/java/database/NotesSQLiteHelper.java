@@ -103,4 +103,11 @@ public class NotesSQLiteHelper extends SQLiteOpenHelper {
 
     }
 
+    public void renameTable(SQLiteDatabase db, String table_name, String new_name){
+        db.execSQL("ALTER TABLE " + "\"" + table_name + "\"" + " RENAME TO " + "\"" + new_name + "\"" + ";");
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("TABLE_NAME",new_name);
+        db.update("TB_LIST",contentValues,"TABLE_NAME = ?", new String[]{ table_name });
+    }
+
 }
