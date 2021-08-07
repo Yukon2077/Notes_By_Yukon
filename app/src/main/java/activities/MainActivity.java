@@ -6,33 +6,25 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
 import androidx.preference.PreferenceManager;
-
-import android.content.Context;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
-
 import com.yukon.notes.R;
-
 import java.util.ArrayList;
 import java.util.List;
-
+import adapters.TableAdapter;
 import database.NotesSQLiteHelper;
 
 public class MainActivity extends AppCompatActivity {
@@ -40,10 +32,10 @@ public class MainActivity extends AppCompatActivity {
     public Toolbar toolbar;
     public NotesSQLiteHelper notesSQLiteHelper;
     public SQLiteDatabase db;
-    public ListView listView;
     public ArrayAdapter adapter;
     public List<String> StringArray;
-    public String selectedWord;
+    public RecyclerView recyclerView;
+    public TableAdapter tableAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +46,6 @@ public class MainActivity extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        listView = findViewById(R.id.recyclerview);
         StringArray = new ArrayList<>();
         notesSQLiteHelper = new NotesSQLiteHelper(this);
         db = notesSQLiteHelper.getWritableDatabase();
@@ -64,17 +55,10 @@ public class MainActivity extends AppCompatActivity {
                 StringArray.add(cursor.getString(cursor.getColumnIndex("TABLE_NAME")));
             }while (cursor.moveToNext());
         }
-        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,StringArray);
-        listView.setAdapter(adapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(getApplicationContext(), EntryActivity.class);
-                intent.putExtra("TB_NAME",StringArray.get(position));
-                startActivity(intent);
-            }
-        });
-        registerForContextMenu(listView);
+        recyclerView = findViewById(R.id.recyclerview);
+        tableAdapter = new TableAdapter(StringArray);
+        recyclerView.setAdapter(tableAdapter);
+        recyclerView.setLayoutManager( new LinearLayoutManager(this));
 
     }
 
@@ -116,28 +100,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-        AdapterView.AdapterContextMenuInfo info =
-                (AdapterView.AdapterContextMenuInfo) menuInfo;
-        selectedWord = ((TextView) info.targetView).getText().toString();
-        menu.setHeaderTitle(selectedWord);
-        menu.setHeaderIcon(R.drawable.ic_menu);
-        menu.add("Delete");
-        menu.add("Rename");
-    }
-
-    @Override
     public boolean onContextItemSelected(@NonNull MenuItem item) {
         String title = String.valueOf(item.getTitle());
         switch (title){
             case "Delete":
-                notesSQLiteHelper.deleteTable(db,selectedWord);
-                StringArray.remove(selectedWord);
-                adapter.notifyDataSetChanged();
+                notesSQLiteHelper.deleteTable(db,StringArray.get(tableAdapter.getTablePosition()));
+                StringArray.remove(StringArray.get(tableAdapter.getTablePosition()));
+                tableAdapter.notifyDataSetChanged();
                 return true;
             case "Rename":
-                renameTableDialog(selectedWord);
+                renameTableDialog(StringArray.get(tableAdapter.getTablePosition()));
                 return true;
         }
         return super.onContextItemSelected(item);
@@ -161,7 +133,7 @@ public class MainActivity extends AppCompatActivity {
                 String table_name = String.valueOf(input.getText());
                 notesSQLiteHelper.addTable(db, table_name);
                 StringArray.add(table_name);
-                adapter.notifyDataSetChanged();
+                tableAdapter.notifyDataSetChanged();
 
             }
         });
