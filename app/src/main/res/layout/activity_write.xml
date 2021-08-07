@@ -22,6 +22,7 @@
         android:layout_height="0dp"
         android:gravity="start|top"
         android:backgroundTint="@color/transparent"
+        android:hint="Write anything."
         android:inputType="textMultiLine|textAutoCorrect|textCapSentences"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
