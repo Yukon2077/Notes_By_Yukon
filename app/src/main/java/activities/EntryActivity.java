@@ -2,41 +2,19 @@ package activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.FrameLayout;
-
-import com.google.android.material.navigation.NavigationView;
 import com.yukon.notes.R;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import adapters.EntryAdapter;
 import database.NotesSQLiteHelper;
-
-import static database.NotesSQLiteHelper.DEFAULT_TABLE;
 
 public class EntryActivity extends AppCompatActivity {
 
@@ -86,11 +64,6 @@ public class EntryActivity extends AppCompatActivity {
                 entryAdapter.swapCursor(notesSQLiteHelper.getAllItems(db, CURRENT_TABLE));
             }
         }).attachToRecyclerView(recyclerView);
-    }
-
-    public void newEntry(View view) {
-        Intent newEntry = new Intent(this, WriteActivity.class);
-        startActivity(newEntry);
     }
 
     @Override

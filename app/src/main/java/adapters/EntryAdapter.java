@@ -7,13 +7,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.yukon.notes.R;
-
 import activities.WriteActivity;
 
 public class EntryAdapter extends RecyclerView.Adapter <EntryAdapter.EntryViewHolder> {
@@ -62,8 +59,6 @@ public class EntryAdapter extends RecyclerView.Adapter <EntryAdapter.EntryViewHo
                 mContext.startActivity(intent);
             }
         });
-
-
     }
 
     public static class  EntryViewHolder extends RecyclerView.ViewHolder{
