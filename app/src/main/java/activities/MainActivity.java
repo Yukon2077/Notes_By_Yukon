@@ -32,7 +32,6 @@ public class MainActivity extends AppCompatActivity {
     public Toolbar toolbar;
     public NotesSQLiteHelper notesSQLiteHelper;
     public SQLiteDatabase db;
-    public ArrayAdapter adapter;
     public List<String> StringArray;
     public RecyclerView recyclerView;
     public TableAdapter tableAdapter;
@@ -170,7 +169,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 notesSQLiteHelper.renameTable(db, table_name, new_name);
                 StringArray.set(StringArray.indexOf(table_name),new_name);
-                adapter.notifyDataSetChanged();
+               tableAdapter.notifyDataSetChanged();
 
             }
         });
@@ -184,6 +183,5 @@ public class MainActivity extends AppCompatActivity {
         builder.show();
 
     }
-
 
 }
