@@ -12,4 +12,6 @@
     <color name="dark_grey">#121212</color>
     <color name="light_dark">#111111</color>
     <color name="light_white">#EEEEEE</color>
+    <color name="light_divider">#DDDDDD</color>
+    <color name="dark_divider">#343434</color>
 </resources>
