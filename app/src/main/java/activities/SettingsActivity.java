@@ -1,5 +1,6 @@
 package activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import androidx.annotation.NonNull;
@@ -7,10 +8,12 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.TaskStackBuilder;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import com.yukon.notes.R;
+import util.Utils;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -18,6 +21,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Utils.setThemeColor(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.settings_activity);
         if (savedInstanceState == null) {
@@ -42,8 +46,8 @@ public class SettingsActivity extends AppCompatActivity {
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey);
 
-            ListPreference listPreference = findPreference("theme_list");
-            listPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            ListPreference themeListPreference = findPreference("theme_list");
+            themeListPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 @Override
                 public boolean onPreferenceChange(Preference preference, Object newValue) {
                     switch (newValue.toString()) {
@@ -57,6 +61,17 @@ public class SettingsActivity extends AppCompatActivity {
                             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
                             break;
                     }
+                    return true;
+                }
+            });
+            ListPreference colorListPreference = findPreference("color_list");
+            colorListPreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue) {
+                    TaskStackBuilder.create(getActivity())
+                            .addNextIntent(new Intent(getActivity(), MainActivity.class))
+                            .addNextIntent(getActivity().getIntent())
+                            .startActivities();
                     return true;
                 }
             });

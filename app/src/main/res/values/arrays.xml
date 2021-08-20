@@ -6,4 +6,9 @@
         <item>Dark</item>
     </array>
 
+    <array name="color_values">
+        <item>Red</item>
+        <item>Blue</item>
+    </array>
+
 </resources>

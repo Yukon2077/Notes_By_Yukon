@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.Locale;
 
 import database.NotesSQLiteHelper;
+import util.Utils;
 
 public class WriteActivity extends AppCompatActivity {
 
@@ -30,6 +31,7 @@ public class WriteActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Utils.setThemeColor(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_write);
 

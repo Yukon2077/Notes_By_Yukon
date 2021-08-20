@@ -15,6 +15,7 @@ import android.view.MenuItem;
 import com.yukon.notes.R;
 import adapters.EntryAdapter;
 import database.NotesSQLiteHelper;
+import util.Utils;
 
 public class EntryActivity extends AppCompatActivity {
 
@@ -28,6 +29,7 @@ public class EntryActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Utils.setThemeColor(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_entry);
 

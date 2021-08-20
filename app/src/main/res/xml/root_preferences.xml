@@ -9,6 +9,12 @@
             android:entries="@array/theme_values"
             android:entryValues="@array/theme_values"
             android:defaultValue="System Default"/>
+        <ListPreference
+            android:defaultValue="Red"
+            android:entries="@array/color_values"
+            android:entryValues="@array/color_values"
+            android:key="color_list"
+            android:title="Color" />
 
     </PreferenceCategory>
 

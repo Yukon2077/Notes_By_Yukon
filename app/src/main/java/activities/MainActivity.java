@@ -17,7 +17,6 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.Toast;
@@ -26,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import adapters.TableAdapter;
 import database.NotesSQLiteHelper;
+import util.Utils;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -38,7 +38,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        setAppTheme();
+        Utils.setDarkTheme(this);
+        Utils.setThemeColor(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -82,21 +83,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void setAppTheme(){
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String theme = sharedPreferences.getString("theme_list","System Default");
-        switch (theme) {
-            case "Light":
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-                break;
-            case "Dark":
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-                break;
-            case "System Default":
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
-                break;
-        }
-    }
 
     @Override
     public boolean onContextItemSelected(@NonNull MenuItem item) {
