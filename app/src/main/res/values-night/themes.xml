@@ -1,4 +1,12 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
+
+    <style name="SplashTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="android:windowBackground">@drawable/splash_bg</item>
+        <item name="android:statusBarColor" tools:targetApi="l">@color/black</item>
+        <item name="colorPrimary">@color/black</item>
+        <item name="colorSecondary">@color/white</item>
+    </style>
+
     <!-- Base application theme. -->
     <style name="Theme.Notes" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
@@ -36,6 +44,15 @@
         <!-- Secondary brand color. -->
         <item name="colorSecondary">@color/blue_200</item>
         <item name="colorSecondaryVariant">@color/dark_blue</item>
+    </style>
+
+    <style name="Theme.Notes.Red" parent="Theme.Notes">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/bright_red</item>
+        <item name="colorPrimaryVariant">@color/dark_red</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/bright_red</item>
+        <item name="colorSecondaryVariant">@color/dark_red</item>
     </style>
 
 </resources>
