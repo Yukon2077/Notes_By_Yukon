@@ -5,7 +5,11 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.widget.Toast;
+
 import androidx.annotation.Nullable;
+
+import activities.EntryActivity;
 import activities.WriteActivity;
 
 public class NotesSQLiteHelper extends SQLiteOpenHelper {
@@ -105,6 +109,47 @@ public class NotesSQLiteHelper extends SQLiteOpenHelper {
         ContentValues contentValues = new ContentValues();
         contentValues.put("TABLE_NAME",new_name);
         db.update("TB_LIST",contentValues,"TABLE_NAME = ?", new String[]{ table_name });
+    }
+
+    public void swapEntries(SQLiteDatabase db, String table_name, Integer sourceID, Integer destinationID) {
+        String sourceEntry, sourceDate, sourceTime, destinationEntry, destinationDate, destinationTime;
+        Cursor sourceCursor = db.query("\"" + table_name + "\"",
+                null,
+                "_id = ?",
+                 new String[]{ String.valueOf(sourceID)},
+                null,
+                null,
+                "_id DESC");
+        sourceCursor.moveToFirst();
+        sourceDate = sourceCursor.getString(sourceCursor.getColumnIndex("DATE"));
+        sourceTime = sourceCursor.getString(sourceCursor.getColumnIndex("TIME"));
+        sourceEntry = sourceCursor.getString(sourceCursor.getColumnIndex("ENTRY"));
+
+
+        Cursor destinationCursor = db.query("\"" + table_name + "\"",
+                null,
+                "_id = ?",
+                 new String[]{ String.valueOf(destinationID)},
+                null,
+                null,
+                "_id DESC");
+        destinationCursor.moveToFirst();
+        destinationDate = destinationCursor.getString(destinationCursor.getColumnIndex("DATE"));
+        destinationTime = destinationCursor.getString(destinationCursor.getColumnIndex("TIME"));
+        destinationEntry = destinationCursor.getString(destinationCursor.getColumnIndex("ENTRY"));
+
+        ContentValues sourceContentValues = new ContentValues();
+        sourceContentValues.put("ENTRY", sourceEntry);
+        sourceContentValues.put("TIME", sourceTime);
+        sourceContentValues.put("DATE", sourceDate);
+
+        ContentValues destinationContentValues = new ContentValues();
+        destinationContentValues.put("ENTRY", destinationEntry);
+        destinationContentValues.put("TIME", destinationTime);
+        destinationContentValues.put("DATE", destinationDate);
+
+        db.update("\"" + table_name + "\"", sourceContentValues,"_id = ?", new String[]{ String.valueOf(destinationID) } );
+        db.update("\"" + table_name + "\"", destinationContentValues,"_id = ?", new String[]{ String.valueOf(sourceID) } );
     }
 
 }

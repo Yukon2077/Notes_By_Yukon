@@ -63,7 +63,7 @@ public class EntryAdapter extends RecyclerView.Adapter <EntryAdapter.EntryViewHo
 
     public static class  EntryViewHolder extends RecyclerView.ViewHolder{
 
-        TextView date,time,entry;
+        TextView date, time, entry;
         CardView cardView;
         public EntryViewHolder(@NonNull View itemView) {
 
@@ -85,15 +85,10 @@ public class EntryAdapter extends RecyclerView.Adapter <EntryAdapter.EntryViewHo
             mCursor.close();
         }
         mCursor=newCursor;
-        if(newCursor!=null){
-            notifyDataSetChanged();
-        }
-
-
     }
 
     public String changeTimeFormat(String time){
-        int x = Integer.parseInt(time.substring(0,time.indexOf(":")));
+        int x = Integer.parseInt(time.substring(0, time.indexOf(":")));
         String y = time.substring(time.indexOf(":"));
         if (x > 12 ){
             x = x-12;
@@ -108,7 +103,7 @@ public class EntryAdapter extends RecyclerView.Adapter <EntryAdapter.EntryViewHo
     }
 
     public String changeDateFormat(String date){
-        String y,m,d;
+        String y, m, d;
         y = date.substring(0,date.indexOf("-"));
         m = date.substring(date.indexOf("-")+1,date.lastIndexOf("-"));
         d = date.substring(date.lastIndexOf("-")+1);
@@ -117,4 +112,10 @@ public class EntryAdapter extends RecyclerView.Adapter <EntryAdapter.EntryViewHo
 
         return date;
     }
+
+    public void removeEntry(Integer position){
+        notifyItemRemoved(position);
+    }
+
+
 }

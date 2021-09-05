@@ -54,16 +54,38 @@ public class EntryActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerview);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(entryAdapter);
-        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT ) {
+        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN ,
+                ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT ) {
             @Override
-            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
-                return false;
+            public boolean onMove(@NonNull RecyclerView recyclerView,
+                                  @NonNull RecyclerView.ViewHolder viewHolder,
+                                  @NonNull RecyclerView.ViewHolder target) {
+                notesSQLiteHelper.swapEntries(db, CURRENT_TABLE, (Integer) viewHolder.itemView.getTag(), (Integer) target.itemView.getTag());
+                Integer viewHolderTag = (Integer) viewHolder.itemView.getTag();
+                Integer targetTag = (Integer) target.itemView.getTag();
+                viewHolder.itemView.setTag(targetTag);
+                target.itemView.setTag(viewHolderTag);
+                entryAdapter.swapCursor(notesSQLiteHelper.getAllItems(db, CURRENT_TABLE));
+                entryAdapter.notifyItemMoved(viewHolder.getAdapterPosition(), target.getAdapterPosition());
+                return true;
             }
 
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                 notesSQLiteHelper.deleteEntry(db, CURRENT_TABLE, (Integer) viewHolder.itemView.getTag());
                 entryAdapter.swapCursor(notesSQLiteHelper.getAllItems(db, CURRENT_TABLE));
+                entryAdapter.removeEntry(viewHolder.getAdapterPosition());
+
+            }
+
+            @Override
+            public boolean isLongPressDragEnabled() {
+                return true;
+            }
+
+            @Override
+            public boolean isItemViewSwipeEnabled() {
+                return true;
             }
         }).attachToRecyclerView(recyclerView);
     }
@@ -72,6 +94,7 @@ public class EntryActivity extends AppCompatActivity {
     protected void onRestart() {
         db = notesSQLiteHelper.getReadableDatabase();
         entryAdapter.swapCursor(notesSQLiteHelper.getAllItems(db, CURRENT_TABLE));
+        entryAdapter.notifyDataSetChanged();
         super.onRestart();
     }
 
