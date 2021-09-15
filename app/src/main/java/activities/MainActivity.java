@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
 import androidx.preference.PreferenceManager;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.content.DialogInterface;
@@ -22,6 +23,7 @@ import android.widget.FrameLayout;
 import android.widget.Toast;
 import com.yukon.notes.R;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import adapters.TableAdapter;
 import database.NotesSQLiteHelper;
@@ -32,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
     public Toolbar toolbar;
     public NotesSQLiteHelper notesSQLiteHelper;
     public SQLiteDatabase db;
-    public List<String> StringArray;
+    public Cursor cursor;
     public RecyclerView recyclerView;
     public TableAdapter tableAdapter;
 
@@ -46,19 +48,32 @@ public class MainActivity extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        StringArray = new ArrayList<>();
         notesSQLiteHelper = new NotesSQLiteHelper(this);
         db = notesSQLiteHelper.getWritableDatabase();
-        Cursor cursor = notesSQLiteHelper.getAllTables(db);
-        if(cursor.moveToFirst()){
-            do{
-                StringArray.add(cursor.getString(cursor.getColumnIndex("TABLE_NAME")));
-            }while (cursor.moveToNext());
-        }
+
+        cursor = notesSQLiteHelper.getAllTables(db);
         recyclerView = findViewById(R.id.recyclerview);
-        tableAdapter = new TableAdapter(StringArray);
+        tableAdapter = new TableAdapter(cursor);
         recyclerView.setAdapter(tableAdapter);
         recyclerView.setLayoutManager( new LinearLayoutManager(this));
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN,0) {
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+
+                String sourceTable = (String) viewHolder.itemView.getTag(), destinationTable = (String) target.itemView.getTag();
+                notesSQLiteHelper.swapTables(db, sourceTable, destinationTable);
+                cursor = notesSQLiteHelper.getAllTables(db);
+                tableAdapter.updateData(cursor);
+                tableAdapter.notifyItemMoved(viewHolder.getAdapterPosition(), target.getAdapterPosition());
+                return true;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+
+            }
+        });
+        itemTouchHelper.attachToRecyclerView(recyclerView);
 
     }
 
@@ -83,23 +98,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
-    @Override
-    public boolean onContextItemSelected(@NonNull MenuItem item) {
-        String title = String.valueOf(item.getTitle());
-        switch (title){
-            case "Delete":
-                notesSQLiteHelper.deleteTable(db,StringArray.get(tableAdapter.getTablePosition()));
-                StringArray.remove(StringArray.get(tableAdapter.getTablePosition()));
-                tableAdapter.notifyDataSetChanged();
-                return true;
-            case "Rename":
-                renameTableDialog(StringArray.get(tableAdapter.getTablePosition()));
-                return true;
-        }
-        return super.onContextItemSelected(item);
-    }
-
     public void addTableDialog(){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Add New File");
@@ -117,45 +115,9 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int which) {
                 String table_name = String.valueOf(input.getText());
                 notesSQLiteHelper.addTable(db, table_name);
-                StringArray.add(table_name);
-                tableAdapter.notifyDataSetChanged();
-
-            }
-        });
-        builder.setNeutralButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
-        builder.setCancelable(true);
-        builder.show();
-
-    }
-
-    public void renameTableDialog(String table_name){
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Rename File");
-        builder.setMessage("Enter a new name");
-        EditText input = new EditText(this);
-        FrameLayout container = new FrameLayout(this);
-        FrameLayout.LayoutParams params = new  FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        params.leftMargin = getResources().getDimensionPixelSize(R.dimen.dialog_margin);
-        params.rightMargin = getResources().getDimensionPixelSize(R.dimen.dialog_margin);
-        input.setLayoutParams(params);
-        container.addView(input);
-        builder.setView(container);
-        builder.setPositiveButton("Rename", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                String new_name = String.valueOf(input.getText());
-                if(table_name.toLowerCase().equals(new_name.toLowerCase())){
-                    Toast.makeText(getApplicationContext(),"New name can't be same as old name",Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                notesSQLiteHelper.renameTable(db, table_name, new_name);
-                StringArray.set(StringArray.indexOf(table_name),new_name);
-               tableAdapter.notifyDataSetChanged();
+                cursor = notesSQLiteHelper.getAllTables(db);
+                tableAdapter.updateData(cursor);
+                tableAdapter.notifyItemInserted(cursor.getCount());
 
             }
         });

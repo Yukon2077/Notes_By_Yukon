@@ -152,4 +152,22 @@ public class NotesSQLiteHelper extends SQLiteOpenHelper {
         db.update("\"" + table_name + "\"", destinationContentValues,"_id = ?", new String[]{ String.valueOf(sourceID) } );
     }
 
+    public void swapTables(SQLiteDatabase db, String sourceName, String destinationName) {
+
+
+        ContentValues sourceContentValues = new ContentValues();
+        sourceContentValues.put("TABLE_NAME", sourceName);
+
+        ContentValues tempCV = new ContentValues();
+        tempCV.put("TABLE_NAME", "TempContentValue" );
+
+        ContentValues destinationContentValues = new ContentValues();
+        destinationContentValues.put("TABLE_NAME", destinationName);
+
+        db.update("TB_LIST", tempCV,"TABLE_NAME = ?", new String[]{destinationName} );
+        db.update("TB_LIST", destinationContentValues,"TABLE_NAME = ?", new String[]{sourceName} );
+        db.update("TB_LIST", sourceContentValues,"TABLE_NAME = ?", new String[]{ "TempContentValue" } );
+
+    }
+
 }

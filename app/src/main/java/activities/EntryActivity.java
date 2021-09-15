@@ -8,11 +8,18 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
+
 import com.yukon.notes.R;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import adapters.EntryAdapter;
 import database.NotesSQLiteHelper;
 import util.Utils;
@@ -54,15 +61,15 @@ public class EntryActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerview);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(entryAdapter);
+
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN ,
                 ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT ) {
             @Override
-            public boolean onMove(@NonNull RecyclerView recyclerView,
-                                  @NonNull RecyclerView.ViewHolder viewHolder,
-                                  @NonNull RecyclerView.ViewHolder target) {
-                notesSQLiteHelper.swapEntries(db, CURRENT_TABLE, (Integer) viewHolder.itemView.getTag(), (Integer) target.itemView.getTag());
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+
                 Integer viewHolderTag = (Integer) viewHolder.itemView.getTag();
                 Integer targetTag = (Integer) target.itemView.getTag();
+                notesSQLiteHelper.swapEntries(db, CURRENT_TABLE, viewHolderTag, targetTag);
                 viewHolder.itemView.setTag(targetTag);
                 target.itemView.setTag(viewHolderTag);
                 entryAdapter.swapCursor(notesSQLiteHelper.getAllItems(db, CURRENT_TABLE));
@@ -75,7 +82,6 @@ public class EntryActivity extends AppCompatActivity {
                 notesSQLiteHelper.deleteEntry(db, CURRENT_TABLE, (Integer) viewHolder.itemView.getTag());
                 entryAdapter.swapCursor(notesSQLiteHelper.getAllItems(db, CURRENT_TABLE));
                 entryAdapter.removeEntry(viewHolder.getAdapterPosition());
-
             }
 
             @Override
