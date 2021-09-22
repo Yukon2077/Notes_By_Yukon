@@ -101,7 +101,6 @@ public class NotesSQLiteHelper extends SQLiteOpenHelper {
         db.delete("TB_LIST",
                 "TABLE_NAME = ?",
                 new String[]{ table_name });
-
     }
 
     public void renameTable(SQLiteDatabase db, String table_name, String new_name){
@@ -109,65 +108,6 @@ public class NotesSQLiteHelper extends SQLiteOpenHelper {
         ContentValues contentValues = new ContentValues();
         contentValues.put("TABLE_NAME",new_name);
         db.update("TB_LIST",contentValues,"TABLE_NAME = ?", new String[]{ table_name });
-    }
-
-    public void swapEntries(SQLiteDatabase db, String table_name, Integer sourceID, Integer destinationID) {
-        String sourceEntry, sourceDate, sourceTime, destinationEntry, destinationDate, destinationTime;
-        Cursor sourceCursor = db.query("\"" + table_name + "\"",
-                null,
-                "_id = ?",
-                 new String[]{ String.valueOf(sourceID)},
-                null,
-                null,
-                "_id DESC");
-        sourceCursor.moveToFirst();
-        sourceDate = sourceCursor.getString(sourceCursor.getColumnIndex("DATE"));
-        sourceTime = sourceCursor.getString(sourceCursor.getColumnIndex("TIME"));
-        sourceEntry = sourceCursor.getString(sourceCursor.getColumnIndex("ENTRY"));
-
-
-        Cursor destinationCursor = db.query("\"" + table_name + "\"",
-                null,
-                "_id = ?",
-                 new String[]{ String.valueOf(destinationID)},
-                null,
-                null,
-                "_id DESC");
-        destinationCursor.moveToFirst();
-        destinationDate = destinationCursor.getString(destinationCursor.getColumnIndex("DATE"));
-        destinationTime = destinationCursor.getString(destinationCursor.getColumnIndex("TIME"));
-        destinationEntry = destinationCursor.getString(destinationCursor.getColumnIndex("ENTRY"));
-
-        ContentValues sourceContentValues = new ContentValues();
-        sourceContentValues.put("ENTRY", sourceEntry);
-        sourceContentValues.put("TIME", sourceTime);
-        sourceContentValues.put("DATE", sourceDate);
-
-        ContentValues destinationContentValues = new ContentValues();
-        destinationContentValues.put("ENTRY", destinationEntry);
-        destinationContentValues.put("TIME", destinationTime);
-        destinationContentValues.put("DATE", destinationDate);
-
-        db.update("\"" + table_name + "\"", sourceContentValues,"_id = ?", new String[]{ String.valueOf(destinationID) } );
-        db.update("\"" + table_name + "\"", destinationContentValues,"_id = ?", new String[]{ String.valueOf(sourceID) } );
-    }
-
-    public void swapTables(SQLiteDatabase db, String sourceName, String destinationName) {
-
-
-        ContentValues sourceContentValues = new ContentValues();
-        sourceContentValues.put("TABLE_NAME", sourceName);
-
-        ContentValues tempCV = new ContentValues();
-        tempCV.put("TABLE_NAME", "TempContentValue" );
-
-        ContentValues destinationContentValues = new ContentValues();
-        destinationContentValues.put("TABLE_NAME", destinationName);
-
-        db.update("TB_LIST", tempCV,"TABLE_NAME = ?", new String[]{destinationName} );
-        db.update("TB_LIST", destinationContentValues,"TABLE_NAME = ?", new String[]{sourceName} );
-        db.update("TB_LIST", sourceContentValues,"TABLE_NAME = ?", new String[]{ "TempContentValue" } );
-
     }
 
 }

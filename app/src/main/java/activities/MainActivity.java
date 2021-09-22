@@ -56,25 +56,6 @@ public class MainActivity extends AppCompatActivity {
         tableAdapter = new TableAdapter(cursor);
         recyclerView.setAdapter(tableAdapter);
         recyclerView.setLayoutManager( new LinearLayoutManager(this));
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN,0) {
-            @Override
-            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
-
-                String sourceTable = (String) viewHolder.itemView.getTag(), destinationTable = (String) target.itemView.getTag();
-                notesSQLiteHelper.swapTables(db, sourceTable, destinationTable);
-                cursor = notesSQLiteHelper.getAllTables(db);
-                tableAdapter.updateData(cursor);
-                tableAdapter.notifyItemMoved(viewHolder.getAdapterPosition(), target.getAdapterPosition());
-                return true;
-            }
-
-            @Override
-            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-
-            }
-        });
-        itemTouchHelper.attachToRecyclerView(recyclerView);
-
     }
 
     @Override

@@ -62,19 +62,11 @@ public class EntryActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(entryAdapter);
 
-        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN ,
+        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0 ,
                 ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT ) {
             @Override
             public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
-
-                Integer viewHolderTag = (Integer) viewHolder.itemView.getTag();
-                Integer targetTag = (Integer) target.itemView.getTag();
-                notesSQLiteHelper.swapEntries(db, CURRENT_TABLE, viewHolderTag, targetTag);
-                viewHolder.itemView.setTag(targetTag);
-                target.itemView.setTag(viewHolderTag);
-                entryAdapter.swapCursor(notesSQLiteHelper.getAllItems(db, CURRENT_TABLE));
-                entryAdapter.notifyItemMoved(viewHolder.getAdapterPosition(), target.getAdapterPosition());
-                return true;
+                return false;
             }
 
             @Override
