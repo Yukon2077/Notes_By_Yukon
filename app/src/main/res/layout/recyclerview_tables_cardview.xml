@@ -38,7 +38,7 @@
             app:cornerRadius="20dp"
             app:icon="@drawable/ic_more_vert"
             app:iconPadding="0dp"
-            app:iconTint="@color/transparent"
+            app:iconTint="#00000000"
             app:iconTintMode="add"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
