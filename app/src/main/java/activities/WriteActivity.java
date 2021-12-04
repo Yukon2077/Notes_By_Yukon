@@ -11,7 +11,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.yukon.notes.R;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -28,6 +31,7 @@ public class WriteActivity extends AppCompatActivity {
     public SQLiteDatabase db;
     public EditText editText;
     public Integer id;
+    public FloatingActionButton floatingActionButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,12 +57,13 @@ public class WriteActivity extends AppCompatActivity {
             editText.setText(entry);
         }
 
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.create_menu,menu);
-        return super.onCreateOptionsMenu(menu);
+        floatingActionButton = findViewById(R.id.floatingActionButton);
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                save();
+            }
+        });
     }
 
     @Override
@@ -70,9 +75,6 @@ public class WriteActivity extends AppCompatActivity {
                 } else {
                     warnNotSaved();
                 }
-                return true;
-            case R.id.save:
-                save();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

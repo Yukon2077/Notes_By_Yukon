@@ -13,8 +13,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.yukon.notes.R;
 
 import java.util.ArrayList;
@@ -33,6 +35,7 @@ public class EntryActivity extends AppCompatActivity {
     public NotesSQLiteHelper notesSQLiteHelper;
     public SQLiteDatabase db;
     public static String CURRENT_TABLE;
+    public FloatingActionButton floatingActionButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +89,15 @@ public class EntryActivity extends AppCompatActivity {
                 return true;
             }
         }).attachToRecyclerView(recyclerView);
+
+        floatingActionButton = findViewById(R.id.floatingActionButton);
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent create = new Intent(v.getContext(), WriteActivity.class);
+                startActivity(create);
+            }
+        });
     }
 
     @Override
@@ -97,20 +109,10 @@ public class EntryActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.entry_menu,menu);
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
             case android.R.id.home:
                 finish();
-                return true;
-            case R.id.create:
-                Intent create = new Intent(this, WriteActivity.class);
-                startActivity(create);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

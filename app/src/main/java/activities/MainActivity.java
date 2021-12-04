@@ -17,10 +17,13 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.Toast;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.yukon.notes.R;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
     public Cursor cursor;
     public RecyclerView recyclerView;
     public TableAdapter tableAdapter;
+    public FloatingActionButton floatingActionButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +60,14 @@ public class MainActivity extends AppCompatActivity {
         tableAdapter = new TableAdapter(cursor);
         recyclerView.setAdapter(tableAdapter);
         recyclerView.setLayoutManager( new LinearLayoutManager(this));
+
+        floatingActionButton = findViewById(R.id.floatingActionButton);
+        floatingActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addTableDialog();
+            }
+        });
     }
 
     @Override
@@ -67,9 +79,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
-            case R.id.create:
-                addTableDialog();
-                return true;
             case R.id.settings:
                 Intent settings = new Intent(this, SettingsActivity.class);
                 startActivity(settings);
