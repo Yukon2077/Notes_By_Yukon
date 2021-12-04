@@ -10,7 +10,7 @@ public class Utils {
 
     public static void setThemeColor(Context context){
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        String color = sharedPreferences.getString("color_list","Blue");
+        String color = sharedPreferences.getString("color_list","Red");
         switch (color){
             case "Red":
                 context.setTheme(R.style.Theme_Notes_Red);
