@@ -62,7 +62,9 @@ public class EntryActivity extends AppCompatActivity {
 
         entryAdapter = new EntryAdapter(this, notesSQLiteHelper.getAllItems(db, CURRENT_TABLE));
         recyclerView = findViewById(R.id.recyclerview);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        linearLayoutManager.setReverseLayout(true);
+        recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setAdapter(entryAdapter);
 
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0 ,
