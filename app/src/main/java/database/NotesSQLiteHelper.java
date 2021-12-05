@@ -47,7 +47,7 @@ public class NotesSQLiteHelper extends SQLiteOpenHelper {
     }
 
     public void addTable(SQLiteDatabase db, String table_name){
-        db.execSQL("CREATE TABLE " + "\"" + table_name + "\"" +"("
+        db.execSQL("CREATE TABLE IF NOT EXISTS" + "\"" + table_name + "\"" +"("
                 + "_id INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + "DATE DATE, "
                 + "TIME TIME, "
@@ -97,7 +97,7 @@ public class NotesSQLiteHelper extends SQLiteOpenHelper {
     }
 
     public void deleteTable(SQLiteDatabase db, String table_name){
-        db.execSQL("DROP TABLE IF EXISTS " + "\"" + table_name + "\"");
+        db.execSQL("DROP TABLE IF EXISTS " + "\"" + table_name + "\";");
         db.delete("TB_LIST",
                 "TABLE_NAME = ?",
                 new String[]{ table_name });
