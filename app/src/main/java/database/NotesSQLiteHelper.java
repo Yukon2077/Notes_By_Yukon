@@ -27,10 +27,14 @@ public class NotesSQLiteHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE TB_LIST(_id INTEGER PRIMARY KEY AUTOINCREMENT, TABLE_NAME TEXT UNIQUE );" );
         addTable(db, DEFAULT_TABLE);
-        addEntry(db, DEFAULT_TABLE, WriteActivity.getDate(), WriteActivity.getTime(),"In the this page, click + to add entries\nSwipe left or right to delete entries");
-        addEntry(db, DEFAULT_TABLE, WriteActivity.getDate(), WriteActivity.getTime(),"In the previous page, click + to add files\nHold a file to open context menu to delete files");
-        addEntry(db, DEFAULT_TABLE, WriteActivity.getDate(), WriteActivity.getTime(),"An App to write and save notes.\nMade by Yukon.");
         addEntry(db, DEFAULT_TABLE, WriteActivity.getDate(), WriteActivity.getTime(),"Notes");
+        addEntry(db, DEFAULT_TABLE, WriteActivity.getDate(), WriteActivity.getTime(),"An App to write and save notes.\nMade by Yukon.");
+        addEntry(db, DEFAULT_TABLE, WriteActivity.getDate(), WriteActivity.getTime(),"In the previous page, click + to add files\nClick the 3 dots to delete/rename files");
+        addEntry(db, DEFAULT_TABLE, WriteActivity.getDate(), WriteActivity.getTime(),"In the this page, click + to add entries\nSwipe left or right to delete entries");
+        addEntry(db, DEFAULT_TABLE, WriteActivity.getDate(), WriteActivity.getTime(),"You can change Dark Mode and Color in Settings");
+
+
+
     }
 
     @Override
