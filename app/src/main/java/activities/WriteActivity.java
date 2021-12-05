@@ -98,7 +98,7 @@ public class WriteActivity extends AppCompatActivity {
         }
         notesSQLiteHelper = new NotesSQLiteHelper(this);
             db = notesSQLiteHelper.getWritableDatabase();
-            entry = editText.getText().toString();
+            entry = editText.getText().toString().trim();
             if( id == null ) {
                 notesSQLiteHelper.addEntry(db, EntryActivity.CURRENT_TABLE, date, time, entry);
             } else{
