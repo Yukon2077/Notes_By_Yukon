@@ -26,7 +26,7 @@ import util.Utils;
 public class WriteActivity extends AppCompatActivity {
 
     public Toolbar toolbar;
-    public String date, time, entry = "";
+    public String entry = "";
     public NotesSQLiteHelper notesSQLiteHelper;
     public SQLiteDatabase db;
     public EditText editText;
@@ -39,15 +39,11 @@ public class WriteActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_write);
 
-        date = getDate();
-        time = getTime();
-
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeAsUpIndicator(R.drawable.ic_back);
-
         editText = findViewById(R.id.editTextEntry);
 
         Bundle extras = getIntent().getExtras();
@@ -100,28 +96,12 @@ public class WriteActivity extends AppCompatActivity {
             db = notesSQLiteHelper.getWritableDatabase();
             entry = editText.getText().toString().trim();
             if( id == null ) {
-                notesSQLiteHelper.addEntry(db, EntryActivity.CURRENT_TABLE, date, time, entry);
+                notesSQLiteHelper.addEntry(db, EntryActivity.CURRENT_TABLE, entry);
             } else{
-                ContentValues contentValues = new ContentValues();
-                contentValues.put("ENTRY",entry);
-                db.update("\"" + EntryActivity.CURRENT_TABLE + "\"",contentValues,"_id = ?", new String[]{ String.valueOf(id) } );
+                notesSQLiteHelper.updateEntry( db, EntryActivity.CURRENT_TABLE, id, entry);
             }
             db.close();
             finish();
-    }
-
-    public static String getTime() {
-        SimpleDateFormat timeFormat = new SimpleDateFormat(
-                "HH:mm", Locale.getDefault());
-        Date time = new Date();
-        return timeFormat.format(time);
-    }
-
-    public static String getDate() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat(
-                "yyyy-MM-dd", Locale.getDefault());
-        Date date = new Date();
-        return dateFormat.format(date);
     }
 
     @Override

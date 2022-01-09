@@ -9,6 +9,10 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 import activities.EntryActivity;
 import activities.WriteActivity;
 
@@ -25,13 +29,14 @@ public class NotesSQLiteHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE TB_LIST(_id INTEGER PRIMARY KEY AUTOINCREMENT, TABLE_NAME TEXT UNIQUE );" );
+        db.execSQL("CREATE TABLE TB_LIST(_id INTEGER PRIMARY KEY AUTOINCREMENT, TABLE_NAME TEXT UNIQUE, " +
+                "CREATED_DATETIME DATETIME, LAST_MODIFIED_DATETIME DATETIME );" );
         addTable(db, DEFAULT_TABLE);
-        addEntry(db, DEFAULT_TABLE, WriteActivity.getDate(), WriteActivity.getTime(),"Notes");
-        addEntry(db, DEFAULT_TABLE, WriteActivity.getDate(), WriteActivity.getTime(),"An App to write and save notes.\nMade by Yukon.");
-        addEntry(db, DEFAULT_TABLE, WriteActivity.getDate(), WriteActivity.getTime(),"In the previous page, click + to add files\nClick the 3 dots to delete/rename files");
-        addEntry(db, DEFAULT_TABLE, WriteActivity.getDate(), WriteActivity.getTime(),"In the this page, click + to add entries\nSwipe left or right to delete entries");
-        addEntry(db, DEFAULT_TABLE, WriteActivity.getDate(), WriteActivity.getTime(),"You can change Dark Mode and Color in Settings");
+        addEntry(db, DEFAULT_TABLE, "Notes");
+        addEntry(db, DEFAULT_TABLE, "An App to write and save notes.\nMade by Yukon.");
+        addEntry(db, DEFAULT_TABLE, "In the previous page, click + to add files\nClick the 3 dots to delete/rename files");
+        addEntry(db, DEFAULT_TABLE, "In the this page, click + to add entries\nSwipe left or right to delete entries");
+        addEntry(db, DEFAULT_TABLE, "You can change Dark Mode and Color in Settings");
 
 
 
@@ -53,22 +58,22 @@ public class NotesSQLiteHelper extends SQLiteOpenHelper {
     public void addTable(SQLiteDatabase db, String table_name){
         db.execSQL("CREATE TABLE IF NOT EXISTS" + "\"" + table_name + "\"" +"("
                 + "_id INTEGER PRIMARY KEY AUTOINCREMENT, "
-                + "DATE DATE, "
-                + "TIME TIME, "
+                + "CREATED_DATETIME DATETIME, "
+                + "LAST_MODIFIED_DATETIME DATETIME, "
                 + "ENTRY TEXT);");
         ContentValues contentValues = new ContentValues();
         contentValues.put("TABLE_NAME",table_name);
+        contentValues.put("CREATED_DATETIME", getCurrentDateTime());
+        contentValues.put("LAST_MODIFIED_DATETIME", getCurrentDateTime());
         db.insert("TB_LIST",null, contentValues);
     }
 
     public void addEntry(SQLiteDatabase db,
                          String table_name,
-                         String date,
-                         String time,
                          String entry){
         ContentValues contentValues = new ContentValues();
-        contentValues.put("DATE",date);
-        contentValues.put("TIME",time);
+        contentValues.put("CREATED_DATETIME", getCurrentDateTime());
+        contentValues.put("LAST_MODIFIED_DATETIME", getCurrentDateTime());
         contentValues.put("ENTRY",entry);
         db.insert("\"" + table_name + "\"",null, contentValues);
     }
@@ -80,7 +85,7 @@ public class NotesSQLiteHelper extends SQLiteOpenHelper {
                 null,
                 null,
                 null,
-                "_id ASC");
+                "_id ASC"); /*Need to have sorting*/
     }
 
     public Cursor getAllItems(SQLiteDatabase db, String table_name){
@@ -90,7 +95,7 @@ public class NotesSQLiteHelper extends SQLiteOpenHelper {
                 null,
                 null,
                 null,
-                "_id DESC");
+                "_id DESC"); /*Need to have sorting*/
 
     }
 
@@ -111,7 +116,21 @@ public class NotesSQLiteHelper extends SQLiteOpenHelper {
         db.execSQL("ALTER TABLE " + "\"" + table_name + "\"" + " RENAME TO " + "\"" + new_name + "\"" + ";");
         ContentValues contentValues = new ContentValues();
         contentValues.put("TABLE_NAME",new_name);
+        contentValues.put("LAST_MODIFIED_DATETIME", getCurrentDateTime());
         db.update("TB_LIST",contentValues,"TABLE_NAME = ?", new String[]{ table_name });
+    }
+
+    public void updateEntry(SQLiteDatabase db, String table_name, Integer id, String entry) {
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("ENTRY",entry);
+        contentValues.put("LAST_MODIFIED_DATETIME", getCurrentDateTime());
+        db.update("\"" + table_name + "\"",contentValues,"_id = ?", new String[]{ String.valueOf(id) } );
+    }
+
+    private String getCurrentDateTime() {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        Date date = new Date();
+        return simpleDateFormat.format(date);
     }
 
 }

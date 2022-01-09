@@ -11,6 +11,12 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 import com.yukon.notes.R;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 import activities.WriteActivity;
 
 public class EntryAdapter extends RecyclerView.Adapter <EntryAdapter.EntryViewHolder> {
@@ -36,18 +42,15 @@ public class EntryAdapter extends RecyclerView.Adapter <EntryAdapter.EntryViewHo
         if(!mCursor.moveToPosition(position)){
             return;
         }
-        String date,time,entry;
+        String datetime,entry;
         Integer id;
-        date = mCursor.getString(mCursor.getColumnIndex("DATE"));
-        time = mCursor.getString(mCursor.getColumnIndex("TIME"));
+        datetime = mCursor.getString(mCursor.getColumnIndex("CREATED_DATETIME"));
         entry = mCursor.getString(mCursor.getColumnIndex("ENTRY"));
         id = mCursor.getInt(mCursor.getColumnIndex("_id"));
 
-        time = changeTimeFormat(time);
-        date = changeDateFormat(date);
+        datetime = changeDateTimeFormat(datetime);
 
-        holder.time.setText(time);
-        holder.date.setText(date);
+        holder.datetime.setText(datetime);
         holder.entry.setText(entry);
         holder.itemView.setTag(id);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -63,12 +66,11 @@ public class EntryAdapter extends RecyclerView.Adapter <EntryAdapter.EntryViewHo
 
     public static class  EntryViewHolder extends RecyclerView.ViewHolder{
 
-        TextView date, time, entry;
+        TextView datetime, entry;
         public EntryViewHolder(@NonNull View itemView) {
 
             super(itemView);
-            date = itemView.findViewById(R.id.date);
-            time = itemView.findViewById(R.id.time);
+            datetime = itemView.findViewById(R.id.datetime);
             entry = itemView.findViewById(R.id.entry);
         }
     }
@@ -85,30 +87,17 @@ public class EntryAdapter extends RecyclerView.Adapter <EntryAdapter.EntryViewHo
         mCursor=newCursor;
     }
 
-    public String changeTimeFormat(String time){
-        int x = Integer.parseInt(time.substring(0, time.indexOf(":")));
-        String y = time.substring(time.indexOf(":"));
-        if (x > 12 ){
-            x = x-12;
-            time = x + y + " PM";
-        } else if(x>0){
-            time = x + y + " AM";
-        } else{
-            x=12;
-            time = x + y + " AM";
+    public String changeDateTimeFormat(String dateString){
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        Date date = null;
+        try {
+            date = simpleDateFormat.parse(dateString);
+            SimpleDateFormat displayDateFormat = new SimpleDateFormat("yy/MM/dd hh:mm a", Locale.getDefault());
+            return displayDateFormat.format(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return "Parse Exception";
         }
-        return time;
-    }
-
-    public String changeDateFormat(String date){
-        String y, m, d;
-        y = date.substring(0,date.indexOf("-"));
-        m = date.substring(date.indexOf("-")+1,date.lastIndexOf("-"));
-        d = date.substring(date.lastIndexOf("-")+1);
-
-        date = m + "/" + d;
-
-        return date;
     }
 
     public void removeEntry(Integer position){
