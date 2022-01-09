@@ -2,20 +2,26 @@
 <resources>
 
     <color name="red_50">#ffe9eb</color>
-    <color name="red_200">#eb938e</color>
-    <color name="red_300">#de6962</color>
-    <color name="red_400">#e5473b</color>
-    <color name="red_500">#e7351b</color>
-    <color name="red_700">#c81e17</color>
-    <color name="red_900">#ac0000</color>
+    <color name="red_100">#ffc7cb</color>
+    <color name="red_200">#fa8f8b</color>
+    <color name="red_300">#f2605d</color>
+    <color name="red_400">#fb3232</color>
+    <color name="red_500">#ff0303</color>
+    <color name="red_600">#f1000a</color>
+    <color name="red_700">#df0005</color>
+    <color name="red_800">#d30000</color>
+    <color name="red_900">#c60000</color>
 
-    <color name="blue_50">#e0f5ff</color>
-    <color name="blue_200">#7cd4ff</color>
-    <color name="blue_300">#40c4ff</color>
-    <color name="blue_400">#24b6fe</color>
-    <color name="blue_500">#00a8fd</color>
-    <color name="blue_800">#0075c5</color>
-    <color name="blue_900">#0055a2</color>
+    <color name="blue_50">#e2f1fe</color>
+    <color name="blue_100">#b9dcfd</color>
+    <color name="blue_200">#8cc7fd</color>
+    <color name="blue_300">#5cb0fc</color>
+    <color name="blue_400">#359ffc</color>
+    <color name="blue_500">#018ffa</color>
+    <color name="blue_600">#0c81eb</color>
+    <color name="blue_700">#0f6fd8</color>
+    <color name="blue_800">#105ec6</color>
+    <color name="blue_900">#103fa7</color>
 
     <color name="black">#000000</color>
     <color name="white">#FFFFFF</color>

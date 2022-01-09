@@ -50,7 +50,7 @@ public class EntryAdapter extends RecyclerView.Adapter <EntryAdapter.EntryViewHo
         holder.date.setText(date);
         holder.entry.setText(entry);
         holder.itemView.setTag(id);
-        holder.cardView.setOnClickListener(new View.OnClickListener() {
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(mContext, WriteActivity.class);
@@ -64,14 +64,12 @@ public class EntryAdapter extends RecyclerView.Adapter <EntryAdapter.EntryViewHo
     public static class  EntryViewHolder extends RecyclerView.ViewHolder{
 
         TextView date, time, entry;
-        CardView cardView;
         public EntryViewHolder(@NonNull View itemView) {
 
             super(itemView);
             date = itemView.findViewById(R.id.date);
             time = itemView.findViewById(R.id.time);
             entry = itemView.findViewById(R.id.entry);
-            cardView = itemView.findViewById(R.id.cardview);
         }
     }
 

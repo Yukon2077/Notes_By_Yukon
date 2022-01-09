@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -48,15 +49,15 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.TableViewHol
         String table_name = cursor.getString(cursor.getColumnIndex("TABLE_NAME"));
         holder.tb_name.setText(table_name);
         holder.itemView.setTag(table_name);
-        holder.cardView.setOnClickListener(new View.OnClickListener() {
+        holder.linearLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(holder.cardView.getContext(), EntryActivity.class);
+                Intent intent = new Intent(holder.linearLayout.getContext(), EntryActivity.class);
                 intent.putExtra("TB_NAME",table_name);
-                holder.cardView.getContext().startActivity(intent);
+                holder.linearLayout.getContext().startActivity(intent);
             }
         });
-        holder.materialButton.setOnClickListener(new View.OnClickListener() {
+        /*holder.materialButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 setTablePosition(position);
@@ -127,24 +128,22 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.TableViewHol
                 });
                 popup.show();
             }
-        });
+        });*/
     }
 
     @Override
     public TableAdapter.TableViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        MaterialCardView cardView = (MaterialCardView) LayoutInflater.from(parent.getContext()).inflate(R.layout.recyclerview_tables_cardview,parent,false);
-        return new TableViewHolder(cardView);
+        LinearLayout linearLayout = (LinearLayout) LayoutInflater.from(parent.getContext()).inflate(R.layout.recyclerview_tables_cardview,parent,false);
+        return new TableViewHolder(linearLayout);
     }
 
     public static class TableViewHolder extends RecyclerView.ViewHolder {
-        public MaterialCardView cardView;
-        public MaterialButton materialButton;
+        public LinearLayout linearLayout;
         public TextView tb_name;
-        public TableViewHolder(MaterialCardView cardView){
-            super(cardView);
-            this.cardView = cardView;
-            tb_name = cardView.findViewById(R.id.table_name);
-            materialButton = cardView.findViewById(R.id.materialButton);
+        public TableViewHolder(LinearLayout linearLayout){
+            super(linearLayout);
+            this.linearLayout = linearLayout;
+            tb_name = linearLayout.findViewById(R.id.table_name);
         }
     }
 
