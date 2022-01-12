@@ -6,28 +6,27 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.view.ContextMenu;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
+import android.widget.ImageButton;
+import android.widget.ListAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.ListPopupWindow;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.button.MaterialButton;
-import com.google.android.material.card.MaterialCardView;
 import com.yukon.notes.R;
 
-import java.util.Collections;
-import java.util.List;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 import activities.EntryActivity;
 import database.NotesSQLiteHelper;
@@ -35,7 +34,6 @@ import database.NotesSQLiteHelper;
 public class TableAdapter extends RecyclerView.Adapter<TableAdapter.TableViewHolder> {
 
     private Cursor cursor;
-    private Integer tableposition;
 
     public TableAdapter(Cursor cursor){
         this.cursor = cursor;
@@ -49,19 +47,33 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.TableViewHol
         String table_name = cursor.getString(cursor.getColumnIndex("TABLE_NAME"));
         holder.tb_name.setText(table_name);
         holder.itemView.setTag(table_name);
-        holder.linearLayout.setOnClickListener(new View.OnClickListener() {
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(holder.linearLayout.getContext(), EntryActivity.class);
+                Intent intent = new Intent(v.getContext(), EntryActivity.class);
                 intent.putExtra("TB_NAME",table_name);
-                holder.linearLayout.getContext().startActivity(intent);
+                v.getContext().startActivity(intent);
             }
         });
-        /*holder.materialButton.setOnClickListener(new View.OnClickListener() {
+        holder.imageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                setTablePosition(position);
                 PopupMenu popup = new PopupMenu(view.getContext(), view);
+                try {
+                    Field[] fields = popup.getClass().getDeclaredFields();
+                    for (Field field : fields) {
+                        if ("mPopup".equals(field.getName())) {
+                            field.setAccessible(true);
+                            Object menuPopupHelper = field.get(popup);
+                            Class<?> classPopupHelper = Class.forName(menuPopupHelper.getClass().getName());
+                            Method setForceIcons = classPopupHelper.getMethod("setForceShowIcon", boolean.class);
+                            setForceIcons.invoke(menuPopupHelper, true);
+                            break;
+                        }
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 popup.inflate(R.menu.popup_menu);
                 popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
@@ -73,6 +85,7 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.TableViewHol
                         switch (item.getItemId()) {
 
                             case R.id.delete:
+                                // Needs confirmation
                                 notesSQLiteHelper.deleteTable(db,table_name);
                                 cursor = notesSQLiteHelper.getAllTables(db);
                                 updateData(cursor);
@@ -82,7 +95,7 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.TableViewHol
                             case R.id.rename:
                                 Context context = holder.itemView.getContext();
                                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                                builder.setTitle("Rename File");
+                                builder.setTitle("Rename document");
                                 builder.setMessage("Enter a new name");
                                 EditText input = new EditText(context);
                                 FrameLayout container = new FrameLayout(context);
@@ -97,11 +110,9 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.TableViewHol
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         String new_name = String.valueOf(input.getText());
+                                        // Needs more Exception handling
                                         if(table_name.toLowerCase().equals(new_name.toLowerCase())){
                                             Toast.makeText(context,"New name can't be same as old name",Toast.LENGTH_SHORT).show();
-                                            return;
-                                        } else if (new_name.equals("TempContentValue")){
-                                            Toast.makeText(context,"New name can't be that, the app uses it",Toast.LENGTH_SHORT).show();
                                             return;
                                         }
                                         notesSQLiteHelper.renameTable(db, table_name, new_name);
@@ -128,22 +139,23 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.TableViewHol
                 });
                 popup.show();
             }
-        });*/
+        });
     }
 
     @Override
     public TableAdapter.TableViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        LinearLayout linearLayout = (LinearLayout) LayoutInflater.from(parent.getContext()).inflate(R.layout.recyclerview_tables_cardview,parent,false);
-        return new TableViewHolder(linearLayout);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recyclerview_tables_cardview,parent,false);
+        return new TableViewHolder(view);
     }
 
     public static class TableViewHolder extends RecyclerView.ViewHolder {
-        public LinearLayout linearLayout;
+
         public TextView tb_name;
-        public TableViewHolder(LinearLayout linearLayout){
-            super(linearLayout);
-            this.linearLayout = linearLayout;
-            tb_name = linearLayout.findViewById(R.id.table_name);
+        public ImageButton imageButton;
+        public TableViewHolder(View view){
+            super(view);
+            tb_name = view.findViewById(R.id.table_name);
+            imageButton = view.findViewById(R.id.imageButton);
         }
     }
 
@@ -152,16 +164,9 @@ public class TableAdapter extends RecyclerView.Adapter<TableAdapter.TableViewHol
         return cursor.getCount();
     }
 
-    public Integer getTablePosition() {
-        return tableposition;
-    }
-
-    public void setTablePosition(Integer position) {
-        this.tableposition = position;
-    }
-
     public void updateData(Cursor cursor){
         this.cursor = cursor;
+        notifyDataSetChanged();
     }
 
 }

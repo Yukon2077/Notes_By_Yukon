@@ -61,48 +61,69 @@ public class NotesSQLiteHelper extends SQLiteOpenHelper {
                 + "CREATED_DATETIME DATETIME, "
                 + "LAST_MODIFIED_DATETIME DATETIME, "
                 + "ENTRY TEXT);");
+        String date = getCurrentDateTime();
         ContentValues contentValues = new ContentValues();
         contentValues.put("TABLE_NAME",table_name);
-        contentValues.put("CREATED_DATETIME", getCurrentDateTime());
-        contentValues.put("LAST_MODIFIED_DATETIME", getCurrentDateTime());
+        contentValues.put("CREATED_DATETIME", date);
+        contentValues.put("LAST_MODIFIED_DATETIME", date);
         db.insert("TB_LIST",null, contentValues);
     }
 
     public void addEntry(SQLiteDatabase db,
                          String table_name,
                          String entry){
+        String date = getCurrentDateTime();
         ContentValues contentValues = new ContentValues();
-        contentValues.put("CREATED_DATETIME", getCurrentDateTime());
-        contentValues.put("LAST_MODIFIED_DATETIME", getCurrentDateTime());
+        contentValues.put("CREATED_DATETIME", date);
+        contentValues.put("LAST_MODIFIED_DATETIME", date);
         contentValues.put("ENTRY",entry);
         db.insert("\"" + table_name + "\"",null, contentValues);
+
+        contentValues = new ContentValues();
+        contentValues.put("LAST_MODIFIED_DATETIME", date);
+        db.update("TB_LIST",contentValues,"TABLE_NAME = ?", new String[]{ table_name });
     }
 
-    public Cursor getAllTables(SQLiteDatabase db){
+    public Cursor getAllTables(SQLiteDatabase db) {
         return db.query("TB_LIST",
                 null,
                 null,
                 null,
                 null,
                 null,
-                "_id ASC"); /*Need to have sorting*/
+                "LAST_MODIFIED_DATETIME DESC"); /* Need to have sorting for created_date_time */
     }
 
-    public Cursor getAllItems(SQLiteDatabase db, String table_name){
+    public Cursor getAllItems(SQLiteDatabase db, String table_name) {
         return  db.query("\"" + table_name + "\"",
                 null,
                 null,
                 null,
                 null,
                 null,
-                "_id DESC"); /*Need to have sorting*/
+                "LAST_MODIFIED_DATETIME DESC"); /* Need to have sorting for created_date_time */
+    }
 
+    public String getEntry(SQLiteDatabase db, String table_name, int id) {
+        Cursor cursor = db.query("\"" + table_name + "\"",
+                null,
+                "_id = ?",
+                new String[] {String.valueOf(id)},
+                null,
+                null,
+                "_id ASC");
+        cursor.moveToFirst();
+        return cursor.getString(cursor.getColumnIndex("ENTRY"));
     }
 
     public void deleteEntry(SQLiteDatabase db, String table_name, Integer id){
         db.delete("\"" + table_name + "\"",
                 "_id = ?",
                 new String[]{ String.valueOf( id ) });
+        String date = getCurrentDateTime();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put("LAST_MODIFIED_DATETIME", date);
+        db.update("TB_LIST",contentValues,"TABLE_NAME = ?", new String[]{ table_name });
     }
 
     public void deleteTable(SQLiteDatabase db, String table_name){
@@ -114,17 +135,25 @@ public class NotesSQLiteHelper extends SQLiteOpenHelper {
 
     public void renameTable(SQLiteDatabase db, String table_name, String new_name){
         db.execSQL("ALTER TABLE " + "\"" + table_name + "\"" + " RENAME TO " + "\"" + new_name + "\"" + ";");
+        String date = getCurrentDateTime();
         ContentValues contentValues = new ContentValues();
         contentValues.put("TABLE_NAME",new_name);
-        contentValues.put("LAST_MODIFIED_DATETIME", getCurrentDateTime());
+        contentValues.put("LAST_MODIFIED_DATETIME", date);
         db.update("TB_LIST",contentValues,"TABLE_NAME = ?", new String[]{ table_name });
     }
 
     public void updateEntry(SQLiteDatabase db, String table_name, Integer id, String entry) {
+        String date = getCurrentDateTime();
+
         ContentValues contentValues = new ContentValues();
         contentValues.put("ENTRY",entry);
-        contentValues.put("LAST_MODIFIED_DATETIME", getCurrentDateTime());
+        contentValues.put("LAST_MODIFIED_DATETIME", date);
         db.update("\"" + table_name + "\"",contentValues,"_id = ?", new String[]{ String.valueOf(id) } );
+
+
+        contentValues = new ContentValues();
+        contentValues.put("LAST_MODIFIED_DATETIME", date);
+        db.update("TB_LIST",contentValues,"TABLE_NAME = ?", new String[]{ table_name });
     }
 
     private String getCurrentDateTime() {

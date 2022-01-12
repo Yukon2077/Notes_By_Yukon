@@ -11,7 +11,9 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.view.ContextMenu;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
@@ -74,11 +76,24 @@ public class EntryActivity extends AppCompatActivity {
                 startActivity(create);
             }
         });
+        registerForContextMenu(recyclerView);
+    }
+
+    @Override
+    public boolean onContextItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.edit:
+                entryAdapter.edit();
+                return true;
+            case R.id.delete:
+                entryAdapter.delete(this, CURRENT_TABLE);
+                return true;
+        }
+        return false;
     }
 
     @Override
     protected void onRestart() {
-        db = notesSQLiteHelper.getReadableDatabase();
         entryAdapter.swapCursor(notesSQLiteHelper.getAllItems(db, CURRENT_TABLE));
         entryAdapter.notifyDataSetChanged();
         super.onRestart();

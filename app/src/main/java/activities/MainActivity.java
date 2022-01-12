@@ -1,17 +1,7 @@
 package activities;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
-import androidx.appcompat.widget.Toolbar;
-import androidx.preference.PreferenceManager;
-import androidx.recyclerview.widget.ItemTouchHelper;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -21,13 +11,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.yukon.notes.R;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+
 import adapters.TableAdapter;
 import database.NotesSQLiteHelper;
 import util.Utils;
@@ -71,6 +65,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onRestart() {
+        super.onRestart();
+        cursor = notesSQLiteHelper.getAllTables(db);
+        tableAdapter.updateData(cursor);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu,menu);
         return super.onCreateOptionsMenu(menu);
@@ -90,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void addTableDialog(){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Add New File");
+        builder.setTitle("Add new document");
         builder.setMessage("Enter a name");
         EditText input = new EditText(this);
         FrameLayout container = new FrameLayout(this);
@@ -104,6 +105,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String table_name = String.valueOf(input.getText());
+                // Needs Exception handling
                 notesSQLiteHelper.addTable(db, table_name);
                 cursor = notesSQLiteHelper.getAllTables(db);
                 tableAdapter.updateData(cursor);

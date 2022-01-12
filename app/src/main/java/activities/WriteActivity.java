@@ -46,10 +46,13 @@ public class WriteActivity extends AppCompatActivity {
         actionBar.setHomeAsUpIndicator(R.drawable.ic_back);
         editText = findViewById(R.id.editTextEntry);
 
+        notesSQLiteHelper = new NotesSQLiteHelper(this);
+        db = notesSQLiteHelper.getWritableDatabase();
+
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             id = extras.getInt("ID");
-            entry = extras.getString("ENTRY");
+            entry = notesSQLiteHelper.getEntry(db, EntryActivity.CURRENT_TABLE, id);
             editText.setText(entry);
         }
 
@@ -92,16 +95,14 @@ public class WriteActivity extends AppCompatActivity {
             finish();
             return;
         }
-        notesSQLiteHelper = new NotesSQLiteHelper(this);
-            db = notesSQLiteHelper.getWritableDatabase();
-            entry = editText.getText().toString().trim();
-            if( id == null ) {
-                notesSQLiteHelper.addEntry(db, EntryActivity.CURRENT_TABLE, entry);
-            } else{
-                notesSQLiteHelper.updateEntry( db, EntryActivity.CURRENT_TABLE, id, entry);
-            }
-            db.close();
-            finish();
+        entry = editText.getText().toString().trim();
+        if( id == null ) {
+            notesSQLiteHelper.addEntry(db, EntryActivity.CURRENT_TABLE, entry);
+        } else{
+            notesSQLiteHelper.updateEntry( db, EntryActivity.CURRENT_TABLE, id, entry);
+        }
+        db.close();
+        finish();
     }
 
     @Override
