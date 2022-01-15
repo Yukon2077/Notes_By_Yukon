@@ -6,6 +6,10 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.preference.PreferenceManager;
 import com.yukon.notes.R;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 public class Utils {
 
     public static void setThemeColor(Context context){
@@ -38,4 +42,9 @@ public class Utils {
 
     }
 
+    public static String getCurrentDateTime() {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        Date date = new Date();
+        return simpleDateFormat.format(date);
+    }
 }
