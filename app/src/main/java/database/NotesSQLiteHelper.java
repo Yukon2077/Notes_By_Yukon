@@ -106,7 +106,7 @@ import util.Utils;
                 COL_LAST_MODIFIED + " DESC"); /* Need to have sorting for created_date_time */
     }
 
-    public Cursor getAllItems(SQLiteDatabase db, String table_name) {
+    public Cursor getAllEntries(SQLiteDatabase db, String table_name) {
         return  db.query("\"" + table_name + "\"",
                 null,
                 null,

@@ -1,22 +1,19 @@
 package activities;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.ItemTouchHelper;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.view.ContextMenu;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.yukon.notes.R;
@@ -26,6 +23,8 @@ import java.util.List;
 
 import adapters.EntryAdapter;
 import database.NotesSQLiteHelper;
+import models.Entry;
+import models.Table;
 import util.Utils;
 
 public class EntryActivity extends AppCompatActivity {
@@ -37,6 +36,7 @@ public class EntryActivity extends AppCompatActivity {
     public NotesSQLiteHelper notesSQLiteHelper;
     public SQLiteDatabase db;
     public static String CURRENT_TABLE;
+    public List<Entry> entryList;
     public FloatingActionButton floatingActionButton;
 
     @Override
@@ -62,7 +62,7 @@ public class EntryActivity extends AppCompatActivity {
         notesSQLiteHelper = new NotesSQLiteHelper(this);
         db = notesSQLiteHelper.getWritableDatabase();
 
-        entryAdapter = new EntryAdapter(this, notesSQLiteHelper.getAllItems(db, CURRENT_TABLE));
+        entryAdapter = new EntryAdapter(getAdapterData());
         recyclerView = findViewById(R.id.recyclerview);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setReverseLayout(true);
@@ -76,26 +76,29 @@ public class EntryActivity extends AppCompatActivity {
                 startActivity(create);
             }
         });
-        registerForContextMenu(recyclerView);
+
     }
 
-    @Override
-    public boolean onContextItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.edit:
-                entryAdapter.edit();
-                return true;
-            case R.id.delete:
-                entryAdapter.delete(this, CURRENT_TABLE);
-                return true;
+    @SuppressLint("Range")
+    public List<Entry> getAdapterData() {
+        entryList = new ArrayList<>();
+        Cursor cursor = notesSQLiteHelper.getAllEntries(db, CURRENT_TABLE);
+        if (cursor.moveToFirst()) {
+            do {
+                Integer id = cursor.getInt(cursor.getColumnIndex(NotesSQLiteHelper.COL_ID));
+                String entry_text = cursor.getString(cursor.getColumnIndex(NotesSQLiteHelper.COL_ENTRY));
+                String created_datetime = cursor.getString(cursor.getColumnIndex(NotesSQLiteHelper.COL_CREATED));
+                String last_modified_datetime = cursor.getString(cursor.getColumnIndex(NotesSQLiteHelper.COL_LAST_MODIFIED));
+                Entry entry = new Entry(id, entry_text, created_datetime, last_modified_datetime);
+                entryList.add(entry);
+            } while (cursor.moveToNext());
         }
-        return false;
+        return entryList;
     }
 
     @Override
     protected void onRestart() {
-        entryAdapter.swapCursor(notesSQLiteHelper.getAllItems(db, CURRENT_TABLE));
-        entryAdapter.notifyDataSetChanged();
+        entryAdapter.updateEntryList(getAdapterData());
         super.onRestart();
     }
 
