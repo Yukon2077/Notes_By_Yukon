@@ -24,7 +24,6 @@ import java.util.List;
 import adapters.EntryAdapter;
 import database.NotesSQLiteHelper;
 import models.Entry;
-import models.Table;
 import util.Utils;
 
 public class EntryActivity extends AppCompatActivity {

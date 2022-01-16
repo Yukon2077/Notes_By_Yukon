@@ -1,24 +1,20 @@
 package activities;
 
+import android.content.DialogInterface;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.EditText;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import android.content.ContentValues;
-import android.content.DialogInterface;
-import android.database.sqlite.SQLiteDatabase;
-import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.EditText;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.yukon.notes.R;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
 
 import database.NotesSQLiteHelper;
 import util.Utils;
