@@ -129,7 +129,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String table_name = String.valueOf(input.getText());
-                // Needs Exception handling
+                if (table_name.contains("\"") | table_name.contains("'")) {
+                    Toast.makeText(context, "Document name can't contain quotes", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 String status = notesSQLiteHelper.addTable(db, table_name);
                 if (status.equals("OK")) {
                     tableAdapter.addNewTable(table_name);
