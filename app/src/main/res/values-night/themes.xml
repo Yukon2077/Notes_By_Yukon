@@ -14,19 +14,16 @@
         <item name="colorOnPrimary">@color/black</item>
         <!-- Secondary brand color. -->
         <item name="colorOnSecondary">@color/white</item>
-        <!--<item name="colorSecondary">@color/teal_200</item>
-        <item name="colorSecondaryVariant">@color/teal_200</item>
-        <item name="colorOnSecondary">@color/black</item>-->
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">@color/dark_grey</item>
         <!-- Customize your theme here. -->
         <item name="android:windowBackground">@color/dark_grey</item>
         <item name="android:navigationBarColor">@color/dark_grey</item>
         <item name="colorSurface">@color/dark_grey</item>
+        <item name="colorOnSurface">@color/white</item>
         <item name="android:textColorPrimary">@color/white</item>
         <item name="android:textColor">@color/white</item>
-        <item name="android:windowAnimationStyle">@style/WindowAnimationTransition</item>
-        <item name="elevationOverlayEnabled">false</item>
+        <!--<item name="android:windowAnimationStyle">@style/WindowAnimationTransition</item>-->
     </style>
 
     <style name="WindowAnimationTransition">
@@ -36,20 +33,20 @@
 
     <style name="Theme.Notes.Blue" parent="Theme.Notes">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/blue_500</item>
-        <item name="colorPrimaryVariant">@color/blue_900</item>
+        <item name="colorPrimary">@color/blue_200</item>
+        <item name="colorPrimaryVariant">@color/blue_700</item>
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/blue_400</item>
+        <item name="colorSecondary">@color/blue_900</item>
         <item name="colorSecondaryVariant">@color/blue_900</item>
         <item name="colorOnSurface">@color/blue_400</item>
     </style>
 
     <style name="Theme.Notes.Red" parent="Theme.Notes">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/red_500</item>
-        <item name="colorPrimaryVariant">@color/red_900</item>
+        <item name="colorPrimary">@color/red_200</item>
+        <item name="colorPrimaryVariant">@color/red_700</item>
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/red_400</item>
+        <item name="colorSecondary">@color/red_900</item>
         <item name="colorSecondaryVariant">@color/red_900</item>
         <item name="colorOnSurface">@color/red_400</item>
     </style>

@@ -1,20 +1,19 @@
 package activities;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.recyclerview.widget.ItemTouchHelper;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.yukon.notes.R;
@@ -24,6 +23,7 @@ import java.util.List;
 
 import adapters.EntryAdapter;
 import database.NotesSQLiteHelper;
+import models.Entry;
 import util.Utils;
 
 public class EntryActivity extends AppCompatActivity {
@@ -35,6 +35,7 @@ public class EntryActivity extends AppCompatActivity {
     public NotesSQLiteHelper notesSQLiteHelper;
     public SQLiteDatabase db;
     public static String CURRENT_TABLE;
+    public List<Entry> entryList;
     public FloatingActionButton floatingActionButton;
 
     @Override
@@ -60,38 +61,12 @@ public class EntryActivity extends AppCompatActivity {
         notesSQLiteHelper = new NotesSQLiteHelper(this);
         db = notesSQLiteHelper.getWritableDatabase();
 
-        entryAdapter = new EntryAdapter(this, notesSQLiteHelper.getAllItems(db, CURRENT_TABLE));
+        entryAdapter = new EntryAdapter(getAdapterData());
         recyclerView = findViewById(R.id.recyclerview);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setReverseLayout(true);
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setAdapter(entryAdapter);
-
-        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0 ,
-                ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT ) {
-            @Override
-            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
-                return false;
-            }
-
-            @Override
-            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                notesSQLiteHelper.deleteEntry(db, CURRENT_TABLE, (Integer) viewHolder.itemView.getTag());
-                entryAdapter.swapCursor(notesSQLiteHelper.getAllItems(db, CURRENT_TABLE));
-                entryAdapter.removeEntry(viewHolder.getAdapterPosition());
-            }
-
-            @Override
-            public boolean isLongPressDragEnabled() {
-                return true;
-            }
-
-            @Override
-            public boolean isItemViewSwipeEnabled() {
-                return true;
-            }
-        }).attachToRecyclerView(recyclerView);
-
         floatingActionButton = findViewById(R.id.floatingActionButton);
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -100,13 +75,29 @@ public class EntryActivity extends AppCompatActivity {
                 startActivity(create);
             }
         });
+
+    }
+
+    @SuppressLint("Range")
+    public List<Entry> getAdapterData() {
+        entryList = new ArrayList<>();
+        Cursor cursor = notesSQLiteHelper.getAllEntries(db, CURRENT_TABLE);
+        if (cursor.moveToFirst()) {
+            do {
+                Integer id = cursor.getInt(cursor.getColumnIndex(NotesSQLiteHelper.COL_ID));
+                String entry_text = cursor.getString(cursor.getColumnIndex(NotesSQLiteHelper.COL_ENTRY));
+                String created_datetime = cursor.getString(cursor.getColumnIndex(NotesSQLiteHelper.COL_CREATED));
+                String last_modified_datetime = cursor.getString(cursor.getColumnIndex(NotesSQLiteHelper.COL_LAST_MODIFIED));
+                Entry entry = new Entry(id, entry_text, created_datetime, last_modified_datetime);
+                entryList.add(entry);
+            } while (cursor.moveToNext());
+        }
+        return entryList;
     }
 
     @Override
     protected void onRestart() {
-        db = notesSQLiteHelper.getReadableDatabase();
-        entryAdapter.swapCursor(notesSQLiteHelper.getAllItems(db, CURRENT_TABLE));
-        entryAdapter.notifyDataSetChanged();
+        entryAdapter.updateEntryList(getAdapterData());
         super.onRestart();
     }
 

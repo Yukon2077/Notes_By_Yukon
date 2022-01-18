@@ -1,24 +1,20 @@
 package activities;
 
+import android.content.DialogInterface;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.EditText;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import android.content.ContentValues;
-import android.content.DialogInterface;
-import android.database.sqlite.SQLiteDatabase;
-import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.EditText;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.yukon.notes.R;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
 
 import database.NotesSQLiteHelper;
 import util.Utils;
@@ -26,7 +22,7 @@ import util.Utils;
 public class WriteActivity extends AppCompatActivity {
 
     public Toolbar toolbar;
-    public String date, time, entry = "";
+    public String entry = "";
     public NotesSQLiteHelper notesSQLiteHelper;
     public SQLiteDatabase db;
     public EditText editText;
@@ -39,21 +35,20 @@ public class WriteActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_write);
 
-        date = getDate();
-        time = getTime();
-
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeAsUpIndicator(R.drawable.ic_back);
-
         editText = findViewById(R.id.editTextEntry);
+
+        notesSQLiteHelper = new NotesSQLiteHelper(this);
+        db = notesSQLiteHelper.getWritableDatabase();
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             id = extras.getInt("ID");
-            entry = extras.getString("ENTRY");
+            entry = notesSQLiteHelper.getEntry(db, EntryActivity.CURRENT_TABLE, id);
             editText.setText(entry);
         }
 
@@ -96,32 +91,14 @@ public class WriteActivity extends AppCompatActivity {
             finish();
             return;
         }
-        notesSQLiteHelper = new NotesSQLiteHelper(this);
-            db = notesSQLiteHelper.getWritableDatabase();
-            entry = editText.getText().toString().trim();
-            if( id == null ) {
-                notesSQLiteHelper.addEntry(db, EntryActivity.CURRENT_TABLE, date, time, entry);
-            } else{
-                ContentValues contentValues = new ContentValues();
-                contentValues.put("ENTRY",entry);
-                db.update("\"" + EntryActivity.CURRENT_TABLE + "\"",contentValues,"_id = ?", new String[]{ String.valueOf(id) } );
-            }
-            db.close();
-            finish();
-    }
-
-    public static String getTime() {
-        SimpleDateFormat timeFormat = new SimpleDateFormat(
-                "HH:mm", Locale.getDefault());
-        Date time = new Date();
-        return timeFormat.format(time);
-    }
-
-    public static String getDate() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat(
-                "yyyy-MM-dd", Locale.getDefault());
-        Date date = new Date();
-        return dateFormat.format(date);
+        entry = editText.getText().toString().trim();
+        if( id == null ) {
+            notesSQLiteHelper.addEntry(db, EntryActivity.CURRENT_TABLE, entry);
+        } else{
+            notesSQLiteHelper.updateEntry( db, EntryActivity.CURRENT_TABLE, id, entry);
+        }
+        db.close();
+        finish();
     }
 
     @Override
