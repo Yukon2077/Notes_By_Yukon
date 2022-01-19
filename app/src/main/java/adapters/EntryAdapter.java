@@ -1,7 +1,11 @@
 package adapters;
 
+import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -19,11 +23,13 @@ import java.util.List;
 import java.util.Locale;
 
 import activities.WriteActivity;
+import database.NotesSQLiteHelper;
 import models.Entry;
 
 public class EntryAdapter extends RecyclerView.Adapter <EntryAdapter.EntryViewHolder> {
 
     public List<Entry> entryList;
+    private int contextItemId, contextItemPosition;
 
 
     public EntryAdapter(List<Entry> entryList){
@@ -51,12 +57,12 @@ public class EntryAdapter extends RecyclerView.Adapter <EntryAdapter.EntryViewHo
         holder.datetime.setText(datetime);
         holder.entry.setText(entry);
         holder.itemView.setTag(id);
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(v.getContext(), WriteActivity.class);
-                intent.putExtra("ID",id);
-                v.getContext().startActivity(intent);
+            public boolean onLongClick(View view) {
+                contextItemId = id;
+                contextItemPosition = holder.getAdapterPosition();
+                return false;
             }
         });
     }
@@ -66,7 +72,20 @@ public class EntryAdapter extends RecyclerView.Adapter <EntryAdapter.EntryViewHo
         notifyDataSetChanged();
     }
 
-    public static class  EntryViewHolder extends RecyclerView.ViewHolder{
+    public void deleteEntry(Context context, String table_name) {
+        NotesSQLiteHelper notesSQLiteHelper = new NotesSQLiteHelper(context);
+        SQLiteDatabase db = notesSQLiteHelper.getWritableDatabase();
+        notesSQLiteHelper.deleteEntry(db, table_name, contextItemId);
+        notifyItemRemoved(contextItemPosition);
+    }
+
+    public void editEntry(Context context) {
+        Intent intent = new Intent(context, WriteActivity.class);
+        intent.putExtra("ID",contextItemId);
+        context.startActivity(intent);
+    }
+
+    public static class  EntryViewHolder extends RecyclerView.ViewHolder implements View.OnCreateContextMenuListener {
 
         TextView datetime, entry;
         MaterialCardView cardView;
@@ -76,8 +95,16 @@ public class EntryAdapter extends RecyclerView.Adapter <EntryAdapter.EntryViewHo
             datetime = itemView.findViewById(R.id.datetime);
             entry = itemView.findViewById(R.id.entry);
             cardView = itemView.findViewById(R.id.cardview);
+            itemView.setOnCreateContextMenuListener(this);
         }
 
+        @Override
+        public void onCreateContextMenu(ContextMenu contextMenu, View view, ContextMenu.ContextMenuInfo contextMenuInfo) {
+            contextMenu.add(Menu.NONE, R.id.edit,
+                    Menu.NONE, "Edit");
+            contextMenu.add(Menu.NONE, R.id.delete,
+                    Menu.NONE, "Delete");
+        }
     }
 
     @Override
