@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.view.ContextMenu;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -67,6 +68,7 @@ public class EntryActivity extends AppCompatActivity {
         linearLayoutManager.setReverseLayout(true);
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setAdapter(entryAdapter);
+        registerForContextMenu(recyclerView);
         floatingActionButton = findViewById(R.id.floatingActionButton);
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -110,6 +112,19 @@ public class EntryActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.delete:
+                entryAdapter.deleteEntry(this, CURRENT_TABLE);
+                break;
+            case R.id.edit:
+                entryAdapter.editEntry(this);
+                break;
+        }
+        return super.onContextItemSelected(item);
     }
 
 }
