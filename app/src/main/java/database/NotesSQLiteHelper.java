@@ -41,9 +41,9 @@
         addTable(db, DEFAULT_TABLE);
         addEntry(db, DEFAULT_TABLE, "Notes");
         addEntry(db, DEFAULT_TABLE, "An App to write and save notes.\nMade by Yukon.");
-        addEntry(db, DEFAULT_TABLE, "In the previous page, click + to add files\nClick the 3 dots to delete/rename files");
-        addEntry(db, DEFAULT_TABLE, "In the this page, click + to add entries\nSwipe left or right to delete entries");
-        addEntry(db, DEFAULT_TABLE, "You can change Dark Mode and Color in Settings");
+        addEntry(db, DEFAULT_TABLE, "In the previous page, click + to add files\nClick the 3 dots to delete/rename documents.");
+        addEntry(db, DEFAULT_TABLE, "In the this page, click + to add entries\nHold the entries to edit/delete them.");
+        addEntry(db, DEFAULT_TABLE, "You can change Dark Mode and Color in Settings.");
     }
 
     @SuppressLint("Range")
@@ -56,7 +56,6 @@
             }while (cursor.moveToNext());
         }
         db.execSQL("DROP TABLE IF EXISTS " + INDEX_TABLE + ";");
-        deleteTable(db, INDEX_TABLE);
         onCreate(db);
     }
 
