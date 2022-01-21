@@ -76,12 +76,13 @@ public class EntryAdapter extends RecyclerView.Adapter <EntryAdapter.EntryViewHo
         NotesSQLiteHelper notesSQLiteHelper = new NotesSQLiteHelper(context);
         SQLiteDatabase db = notesSQLiteHelper.getWritableDatabase();
         notesSQLiteHelper.deleteEntry(db, table_name, contextItemId);
+        entryList.remove(contextItemPosition);
         notifyItemRemoved(contextItemPosition);
     }
 
     public void editEntry(Context context) {
         Intent intent = new Intent(context, WriteActivity.class);
-        intent.putExtra("ID",contextItemId);
+        intent.putExtra("ID", contextItemId);
         context.startActivity(intent);
     }
 
