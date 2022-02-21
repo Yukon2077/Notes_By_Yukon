@@ -68,7 +68,8 @@
         <item name="colorOnSurfaceInverse">@color/md_blue_theme_dark_inverseOnSurface</item>
         <item name="colorSurfaceInverse">@color/md_blue_theme_dark_inverseSurface</item>
         <item name="colorPrimaryInverse">@color/md_blue_theme_dark_primaryInverse</item>
-        <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
+        <item name="android:statusBarColor">?android:colorBackground</item>
+        <item name="android:navigationBarColor">?android:colorBackground</item>
     </style>
 
     <!--<style name="Theme.Notes.Red" parent="Theme.Notes">
@@ -108,7 +109,8 @@
         <item name="colorOnSurfaceInverse">@color/md_red_theme_dark_inverseOnSurface</item>
         <item name="colorSurfaceInverse">@color/md_red_theme_dark_inverseSurface</item>
         <item name="colorPrimaryInverse">@color/md_red_theme_dark_primaryInverse</item>
-        <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
+        <item name="android:statusBarColor">?android:colorBackground</item>
+        <item name="android:navigationBarColor">?android:colorBackground</item>
     </style>
 
 </resources>
